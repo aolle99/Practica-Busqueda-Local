@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
+public class CentralsEnergiaSuccessorFunction3 implements SuccessorFunction {
 
     public List getSuccessors(Object state) {
 
