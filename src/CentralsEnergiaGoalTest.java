@@ -5,7 +5,8 @@ public class CentralsEnergiaGoalTest implements GoalTest {
 
 
     public boolean isGoalState(Object state) {
-        return true;
+        CentralsEnergiaBoard board = (CentralsEnergiaBoard) state;
+        return board.isGoal();
     }
 
 }
