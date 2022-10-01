@@ -58,8 +58,7 @@ public class CentralsEnergiaBoard {
                         j = new Random().nextInt(centrals.size());
                         ++tries;
                     } else {
-                        j = 0;
-                        caso = 0;
+                        return -1;
                     }
                 }
                 central = centrals.get(j);
@@ -87,6 +86,10 @@ public class CentralsEnergiaBoard {
                     Cliente client = clients.get(i);
                     if (client.getContrato() == Cliente.GARANTIZADO) {
                         j = asignarCentral(i, j, client, 0);
+                        if (j == -1) {
+                            generarEstatInicial(1);
+                            return;
+                        }
                     } else {
                         clientsNoGarantitzats.add(i);
                     }
@@ -103,7 +106,10 @@ public class CentralsEnergiaBoard {
                     Cliente client = clients.get(i);
                     if (client.getContrato() == Cliente.GARANTIZADO) {
                         int random = myRandom.nextInt(centrals.size());
-                        asignarCentral(i, random, client, 1);
+                        if (asignarCentral(i, random, client, 1) == -1) {
+                            generarEstatInicial(1);
+                            return;
+                        }
                     } else {
                         clientsNoGarantitzatsRandom.add(i);
                     }
