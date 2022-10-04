@@ -10,14 +10,21 @@ public class Main {
     static CentralsEnergiaBoard board;
 
     public static void main(String[] args) {
-        int i=1000;
-        while(i>0){
-            i--;
-            try {
-                hillClimbing();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+        try {
+            myRandom = new Random();
+            board = new CentralsEnergiaBoard();
+            board.generarCentrals(new int[]{5, 10, 25},myRandom.nextInt());
+            board.generarClients(1000, new double[]{0.25, 0.30, 0.45}, 0.75,myRandom.nextInt());
+            boolean generat = false;
+            int tries = 0;
+            while (!generat && tries < MAX_TRIES) {
+                generat = board.generarEstatInicial(0);
+                tries++;
             }
+            if (tries==MAX_TRIES) throw new Exception("No s'ha pogut generar l'estat inicial");
+            hillClimbing();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
     }
 

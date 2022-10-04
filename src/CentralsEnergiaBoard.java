@@ -42,9 +42,11 @@ public class CentralsEnergiaBoard {
     private int asignarCentral(int i, int j, Cliente client, int caso) {
         int tries = 0;
         boolean assignat = false;
-        while (j < centrals.size() && !assignat) {
-            Central central = centrals.get(j);
-            double mwLliures = mwLliuresCentrals.get(j);
+        while (central_id < centrals.size() && !assignat) {
+            Central central = centrals.get(central_id);
+            double mwLliures = mwLliuresCentrals.get(central_id);
+            System.out.println("Central:" + central_id); //+ " - mwLliures:" + mwLliures);
+            System.out.println("Client:" + client_id + " - Consum: " + client.getConsumo());
             mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
             if (mwLliures >= 0) {
                 assignacionsConsumidors.set(i, j);
@@ -52,17 +54,16 @@ public class CentralsEnergiaBoard {
                 assignat = true;
             } else {
                 if (caso == 0) {
-                    j += 1;
+                    central_id += 1;
                 }
                 else if(caso == 1) {
                     if(tries < 10) {
-                        j = new Random().nextInt(centrals.size());
+                        central_id = new Random().nextInt(centrals.size());
                         ++tries;
                     } else {
-                        return -1;
+                        if (client.getContrato() == Cliente.GARANTIZADO) return -1;
                     }
                 }
-
             }
         }
         //No queden centrals
@@ -71,7 +72,7 @@ public class CentralsEnergiaBoard {
             else if (caso == 1) assignacionsConsumidors.set(i, myRandom.nextInt(centrals.size()));
             consumidorsZero.add(i);
         }
-        return j;
+        return central_id;
     }
 
     public Boolean generarEstatInicial(int tipus) {
@@ -137,14 +138,14 @@ public class CentralsEnergiaBoard {
     public double getCostCentrals() {
 
         double cost = 0;
-        for (int i=0; i<centrals.size(); ++i) {
+        for (int i = 0; i < centrals.size(); ++i) {
             // Suma dels costos de les centrals que estan enceses
             Central central = centrals.get(i);
-            if (mwLliuresCentrals.get(i)!=null &&central.getProduccion() != mwLliuresCentrals.get(i)) {
+            if (mwLliuresCentrals.get(i) != null &&central.getProduccion() != mwLliuresCentrals.get(i)) {
                 // Sumar costos
                 try {
-                    cost +=VEnergia.getCosteMarcha(central.getTipo());
-                    cost +=VEnergia.getCosteProduccionMW(central.getTipo());
+                    cost += VEnergia.getCosteMarcha(central.getTipo());
+                    cost += VEnergia.getCosteProduccionMW(central.getTipo());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
@@ -152,7 +153,7 @@ public class CentralsEnergiaBoard {
             }
             else {
                 try {
-                    cost+=VEnergia.getCosteParada(central.getTipo());
+                    cost += VEnergia.getCosteParada(central.getTipo());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
