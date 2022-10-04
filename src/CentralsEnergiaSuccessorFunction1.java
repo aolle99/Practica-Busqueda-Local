@@ -12,6 +12,7 @@ public class CentralsEnergiaSuccessorFunction1 implements SuccessorFunction {
         List successors = new ArrayList();
 
         return successors;
+
     }
 
     private void copyOf(EightPuzzleBoard board) {
