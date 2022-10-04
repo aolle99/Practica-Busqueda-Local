@@ -6,6 +6,7 @@ import java.util.Random;
 
 
 public class Main {
+    static final int MAX_TRIES = 100;
     static Random myRandom;
     static CentralsEnergiaBoard board;
 
@@ -28,35 +29,13 @@ public class Main {
         }
     }
 
-    private static void hillClimbing() throws Exception {
+    private static void hillClimbing() {
         //Declarem variables
         CentralsEnergiaSearcher searcher;
-        SuccessorFunction operators = null;
         HeuristicFunction heuristic = null;
+        SuccessorFunction operators = new CentralsEnergiaSuccessorFunction1();
 
-        myRandom = new Random();
-        board = new CentralsEnergiaBoard();
-        board.generarCentrals(new int[]{1, 2, 3});
-        board.generarClients(1000, new double[]{0.25, 0.30, 0.45}, 0.75);
-        boolean generat = false;
-        while (!generat) {
-            generat = board.generarEstatInicial(1);
-        }
-
-        int op = myRandom.nextInt(3);
-        switch (op) {
-            case 0:
-                operators = new CentralsEnergiaSuccessorFunction1();
-                break;
-            case 1:
-                operators = new CentralsEnergiaSuccessorFunction2();
-                break;
-            case 2:
-                operators = new CentralsEnergiaSuccessorFunction3();
-                break;
-        }
-
-        int heu = myRandom.nextInt(6);
+        int heu = 0;
         switch (heu) {
             case 0:
                 heuristic = new HeuristicFunction1();
@@ -79,8 +58,8 @@ public class Main {
         }
 
         try {
-            searcher = new CentralsEnergiaSearcher(board, operators, heuristic);
-            searcher.executeSearch();
+            //searcher = new CentralsEnergiaSearcher(board, operators, heuristic);
+            //searcher.executeSearch();
         }
         catch (Exception e){
             System.err.println(e.toString());
