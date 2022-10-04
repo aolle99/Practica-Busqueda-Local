@@ -1,4 +1,5 @@
-import aima.search.framework.*;
+import aima.search.framework.HeuristicFunction;
+import aima.search.framework.SuccessorFunction;
 
 import java.util.Random;
 
@@ -28,9 +29,12 @@ public class Main {
 
         myRandom = new Random();
         board = new CentralsEnergiaBoard();
-        board.generarCentrals(new int[] {1,2,3});
-        board.generarClients(1000, new double[] {0.25, 0.30, 0.45}, 0.75);
-        board.generarEstatInicial(1);
+        board.generarCentrals(new int[]{1, 2, 3});
+        board.generarClients(1000, new double[]{0.25, 0.30, 0.45}, 0.75);
+        boolean generat = false;
+        while (!generat) {
+            generat = board.generarEstatInicial(1);
+        }
 
         int op = myRandom.nextInt(3);
         switch (op) {

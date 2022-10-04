@@ -20,15 +20,17 @@ public class CentralsEnergiaBoard {
     public void generarCentrals(int[] tipos_centrales) throws Exception {
         int seed = myRandom.nextInt();
         centrals = new Centrales(tipos_centrales, seed);
-        mwLliuresCentrals = new ArrayList<>(centrals.size());
-
+        mwLliuresCentrals = new ArrayList<>();
+        for (Central central : centrals) {
+            mwLliuresCentrals.add(central.getProduccion());
+            System.out.println(central.getProduccion());
+        }
     }
 
     public void generarClients(int ncl, double[] propc, double propg) throws Exception {
         int seed = myRandom.nextInt();
         clients = new Clientes(ncl, propc, propg, seed);
-        assignacionsConsumidors = new ArrayList<>(clients.size());
-
+        assignacionsConsumidors = new ArrayList<>(Collections.nCopies(clients.size(), null));
     }
 
     private static double getDistancia(Cliente cliente, Central central) {
@@ -39,11 +41,10 @@ public class CentralsEnergiaBoard {
 
     private int asignarCentral(int i, int j, Cliente client, int caso) {
         int tries = 0;
-        Central central = centrals.get(j);
         boolean assignat = false;
-        while (!assignat && j < centrals.size()) {
+        while (j < centrals.size() && !assignat) {
+            Central central = centrals.get(j);
             double mwLliures = mwLliuresCentrals.get(j);
-            if (mwLliuresCentrals.get(j)==null) mwLliuresCentrals.set(j, central.getProduccion());
             mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
             if (mwLliures >= 0) {
                 assignacionsConsumidors.set(i, j);
@@ -61,7 +62,7 @@ public class CentralsEnergiaBoard {
                         return -1;
                     }
                 }
-                central = centrals.get(j);
+
             }
         }
         //No queden centrals
@@ -73,22 +74,19 @@ public class CentralsEnergiaBoard {
         return j;
     }
 
-    public void generarEstatInicial(int tipus) {
-        // Generem consumidors
+    public Boolean generarEstatInicial(int tipus) {
         switch (tipus) {
             case 0:
                 int j = 0;
                 ArrayList<Integer> clientsNoGarantitzats = new ArrayList<>();
-                Central central = centrals.get(j);
-                mwLliuresCentrals.set(j, central.getProduccion());
 
                 for (int i = 0; i < clients.size(); ++i) {
                     Cliente client = clients.get(i);
                     if (client.getContrato() == Cliente.GARANTIZADO) {
+                        System.out.println("Client garantitzat" + i);
                         j = asignarCentral(i, j, client, 0);
                         if (j == -1) {
-                            generarEstatInicial(1);
-                            return;
+                            return false;
                         }
                     } else {
                         clientsNoGarantitzats.add(i);
@@ -107,8 +105,7 @@ public class CentralsEnergiaBoard {
                     if (client.getContrato() == Cliente.GARANTIZADO) {
                         int random = myRandom.nextInt(centrals.size());
                         if (asignarCentral(i, random, client, 1) == -1) {
-                            generarEstatInicial(1);
-                            return;
+                            return false;
                         }
                     } else {
                         clientsNoGarantitzatsRandom.add(i);
@@ -121,6 +118,7 @@ public class CentralsEnergiaBoard {
                 }
                 break;
         }
+        return true;
     }
 
     public boolean isGoal() {

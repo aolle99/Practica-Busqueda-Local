@@ -6,8 +6,8 @@ Barcelona (FIB) en el curs 2022/2023 Q1 (Quatrimestre tardor)
 ### Membres de l'equip:
 
 - Cristina Migó Lluis ([cristina.migo@estudiantat.upc.edu](mailto:cristina.migo@estudiantat.upc.edu))
-- Àlex Ollé Parcerisas [alex.olle@estudiantat.upc.edu](mailto:alex.olle@estudiantat.upc.edu)
-- Iria Cervelló Martínez [iria.cervello@estudiantat.upc.edu](mailto:iria.cervello@estudiantat.upc.edu)
+- Àlex Ollé Parcerisas ([alex.olle@estudiantat.upc.edu](mailto:alex.olle@estudiantat.upc.edu))
+- Iria Cervelló Martínez ([iria.cervello@estudiantat.upc.edu](mailto:iria.cervello@estudiantat.upc.edu))
 
 ### Professors:
 
