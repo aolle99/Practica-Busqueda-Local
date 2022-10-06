@@ -43,7 +43,7 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
                     Cliente client2 = clients.get(id_client2);
                     if (!board.assignedToZero(id_client2)) {
                         int id_central2 = board.getCentralAssignada(id_client2);
-                        if (id_central1 != id_central2) {
+                        if (id_central1 != id_central2 && id_central1 != -1 && id_central2 != -1) {
                             CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
                             Central central1 = centrals.get(id_central1);
                             Central central2 = centrals.get(id_central2);
@@ -74,7 +74,7 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
             Cliente client = clients.get(id_client);
             int id_central = board.getCentralAssignada(id_client);
             for (int id_central2 = 0; id_central2 <= centrals.size(); ++id_central2) {
-                if (id_central2 == centrals.size()) { // MOURE CLIENT FORA (assignar-li zero MW)
+                if (id_central2 == centrals.size() && id_central != -1) { // MOURE CLIENT FORA (assignar-li zero MW)
                     if (client.getContrato() == Cliente.NOGARANTIZADO && !board.assignedToZero(id_client)) { //Comprovem que el consumidor no estigui garantitzat
                         CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
                         Central central = centrals.get(id_central);
@@ -90,7 +90,7 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
                         successors.add(new Successor(action, estat_successor));
                     }
                 } else { // MOURE CLIENT DE CENTRAL
-                    if (id_central != id_central2) {
+                    if (id_central != id_central2 && id_central != -1 && id_central2 != -1) {
                         CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
                         Central central = centrals.get(id_central);
                         Central central2 = centrals.get(id_central2);
