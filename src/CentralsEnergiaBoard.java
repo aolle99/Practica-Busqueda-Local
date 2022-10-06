@@ -218,15 +218,9 @@ public class CentralsEnergiaBoard {
     }
 
     //GETTERS I SETTERS
-    public double getMWLliures(){
+    public double getTotalMWLliures() {
 
         return mwLliuresCentrals.stream().reduce(0.0, Double::sum);
-
-        /*double mwLliuresTotals = 0;
-        for (int i = 0; i < mwLliuresCentrals.size(); i++){
-            mwLliuresTotals += mwLliuresCentrals.get(i);
-        }
-        return mwLliuresTotals;*/
     }
 
     public int getClientsNoAssignats(){
@@ -234,13 +228,32 @@ public class CentralsEnergiaBoard {
     }
 
     public int getClientsGarantitzatsNoAssignats() {
-        int count=0;
-        for (int i=0; i<assignacionsConsumidors.size(); ++i) {
+        int count = 0;
+        for (int i = 0; i < assignacionsConsumidors.size(); ++i) {
             if (assignacionsConsumidors.get(i) == null && clients.get(i).getContrato() == Cliente.GARANTIZADO) {
                 count++;
             }
         }
         return count;
+    }
+
+    public double getMWEntropia() {
+        double entropia = 0;
+        for (int i = 0; i < centrals.size(); ++i) {
+            double prob = (centrals.get(i).getProduccion() - mwLliuresCentrals.get(i)) / centrals.get(i).getProduccion();
+            if (prob != 0) {
+                entropia += prob * Math.log(prob);
+            }
+        }
+        return entropia;
+    }
+
+    public double getMWOcupatsAmbPes() {
+        double ocupats = 0;
+        for (int i = 0; i < centrals.size(); ++i) {
+            ocupats += Math.log10(centrals.get(i).getProduccion() - mwLliuresCentrals.get(i));
+        }
+        return ocupats;
     }
 
     public static ArrayList<Central> getCentrals() {

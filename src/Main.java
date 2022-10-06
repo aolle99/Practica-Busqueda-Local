@@ -52,17 +52,13 @@ public class Main {
             case 4:
                 heuristic = new HeuristicFunction5();
                 break;
-            case 5:
-                heuristic = new HeuristicFunction6();
-                break;
         }
-
         try {
-            //searcher = new CentralsEnergiaSearcher(board, operators, heuristic);
-            //searcher.executeSearch();
+            searcher = new CentralsEnergiaSearcher(board, operators, heuristic);
+            searcher.executeSearch();
         }
         catch (Exception e){
-            System.err.println(e.toString());
+            System.err.println(e.getMessage());
         }
     }
 }
