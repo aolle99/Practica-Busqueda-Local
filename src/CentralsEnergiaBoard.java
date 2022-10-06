@@ -17,6 +17,14 @@ public class CentralsEnergiaBoard {
         myRandom = new Random();
     }
 
+    public CentralsEnergiaBoard(CentralsEnergiaBoard board_to_copy) {
+        this.assignacionsConsumidors = new ArrayList<>(board_to_copy.getAssignacionsConsumidors());
+        this.mwLliuresCentrals = new ArrayList<>(board_to_copy.getMwLliuresCentrals());
+        this.consumidorsZero = new HashSet<>(board_to_copy.getConsumidorsZero());
+        this.myRandom = new Random();
+    }
+
+
     public void generarCentrals(int[] tipos_centrales, int seed) throws Exception {
         centrals = new Centrales(tipos_centrales, seed);
         mwLliuresCentrals = new ArrayList<>();
@@ -27,10 +35,10 @@ public class CentralsEnergiaBoard {
 
     public void generarClients(int ncl, double[] propc, double propg,int seed) throws Exception {
         clients = new Clientes(ncl, propc, propg, seed);
-        assignacionsConsumidors = new ArrayList<>(Collections.nCopies(clients.size(), null));
+        assignacionsConsumidors = new ArrayList<>(Collections.nCopies(clients.size(), -1));
     }
 
-    private static double getDistancia(Cliente cliente, Central central) {
+    public static double getDistancia(Cliente cliente, Central central) {
         int x = cliente.getCoordX() - central.getCoordX();
         int y = cliente.getCoordY() - central.getCoordY();
         return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
@@ -63,8 +71,8 @@ public class CentralsEnergiaBoard {
         }
         //No queden centrals
         if (!assignat) {
-            if (caso == 0) assignacionsConsumidors.set(client_id, central_id - 1);
-            else if (caso == 1) assignacionsConsumidors.set(client_id, myRandom.nextInt(centrals.size()));
+            if (caso == 0) assignacionsConsumidors.set(client_id, -1);
+            else if (caso == 1) assignacionsConsumidors.set(client_id, -1);
             consumidorsZero.add(client_id);
         }
         return central_id;
@@ -237,6 +245,14 @@ public class CentralsEnergiaBoard {
         return consumidorsZero;
     }
 
+    public ArrayList<Integer> getAssignacionsConsumidors() {
+        return assignacionsConsumidors;
+    }
+
+    public ArrayList<Double> getMwLliuresCentrals() {
+        return mwLliuresCentrals;
+    }
+
     public Double getMwLliuresCentral(int idCentral) {
         return mwLliuresCentrals.get(idCentral);
     }
@@ -244,4 +260,22 @@ public class CentralsEnergiaBoard {
     public int getCentralAssignada(int idConsumidor) {
         return assignacionsConsumidors.get(idConsumidor);
     }
+
+    public boolean isNoAssignat(int idConsumidor) {
+        return consumidorsZero.contains(idConsumidor);
+    }
+
+    public void setMwLliuresCentral(int idCentral, double mwLliures) {
+        mwLliuresCentrals.set(idCentral, mwLliures);
+    }
+
+    public void setAssignacioConsumidor(int idConsumidor, int idCentral) {
+        assignacionsConsumidors.set(idConsumidor, idCentral);
+    }
+
+    public void setNoAssignat(int idConsumidor) {
+        consumidorsZero.add(idConsumidor);
+    }
+
+
 }
