@@ -134,15 +134,25 @@ public class CentralsEnergiaBoard {
     }
 
     public boolean isGoal() {
-        //Una central no té més demanda de la que pot produir (la suma dels consumidors assignats <= producció màxima central).
+        //Una central no té més demanda de la que pot produir (la suma dels consumidors assignats <= producció màxima central);
+        for (int i = 0; i < mwLliuresCentrals.size(); i++){
+            if (mwLliuresCentrals.get(i) < 0) return false;
+            if (mwLliuresCentrals.get(i) > centrals.get(i).getProduccion()) return false;
+        }
 
         // Si una central està encesa (té algun client assignat), llavors genera tota la producció (tot el cost).
-
-        // Un client només té assignada una central
-
-        // Un client només pot ser servit per una central, i aquesta li ha de donar tota la seva demanda.
+        for (int i = 0; i < mwLliuresCentrals.size(); i++){
+            if (mwLliuresCentrals.get(i) == centrals.get(i).getProduccion()){
+                for (Integer assignacionsConsumidor : assignacionsConsumidors) {
+                    if (assignacionsConsumidor == i) return false;
+                }
+            }
+        }
 
         // Els clients de servei garantit, han de ser servits sempre
+        for (int i = 0; i < consumidorsZero.size(); i++){
+            if (clients.get(i).getContrato() == Cliente.GARANTIZADO) return false;
+        }
         return true;
     }
 
