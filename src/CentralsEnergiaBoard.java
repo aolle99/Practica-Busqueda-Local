@@ -9,12 +9,8 @@ public class CentralsEnergiaBoard {
     private Set<Integer> consumidorsZero;
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
-    private double sumatoriMWLliures;
-    private double sumatoriCostClients;
-    private double sumatoriCostCentrals;
 
     private Random myRandom;
-    private static int assignats = 0;
 
     public CentralsEnergiaBoard() {
         consumidorsZero = new HashSet<>();
@@ -46,11 +42,8 @@ public class CentralsEnergiaBoard {
         while (central_id < centrals.size() && !assignat) {
             Central central = centrals.get(central_id);
             double mwLliures = mwLliuresCentrals.get(central_id);
-            System.out.println("Central:" + central_id); //+ " - mwLliures:" + mwLliures);
-            System.out.println("Client:" + client_id + " - Consum: " + client.getConsumo());
             mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
             if (mwLliures >= 0) {
-                assignats++;
                 assignacionsConsumidors.set(client_id, central_id);
                 mwLliuresCentrals.set(central_id, mwLliures);
                 assignat = true;
@@ -129,9 +122,6 @@ public class CentralsEnergiaBoard {
         } else {
             generat = generarEstatInicialAleatori();
         }
-        sumatoriMWLliures = getMWLliures();
-        sumatoriCostClients = getCostConsumidors();
-        sumatoriCostCentrals = getCostCentrals();
         return generat;
     }
 
