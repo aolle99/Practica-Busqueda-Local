@@ -19,9 +19,9 @@ public class CentralsEnergiaSearcher {
         search = new HillClimbingSearch();
     }
 
-    public CentralsEnergiaSearcher(CentralsEnergiaBoard central, CentralsEnergiaSuccessorFunction1 operators, HeuristicFunction heuristic, int it, int pit, int k, double lbd){
+    public CentralsEnergiaSearcher(CentralsEnergiaBoard central, CentralsEnergiaSuccessorFunction operators, HeuristicFunction heuristic, int it, int pit, int k, double lbd) {
         problem = new Problem(central, operators, new CentralsEnergiaGoalTest(), heuristic);
-        search =  new SimulatedAnnealingSearch(it,pit,k,lbd);
+        search = new SimulatedAnnealingSearch(it, pit, k, lbd);
     }
 
     public void executeSearch(){

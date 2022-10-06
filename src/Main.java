@@ -33,7 +33,7 @@ public class Main {
         //Declarem variables
         CentralsEnergiaSearcher searcher;
         HeuristicFunction heuristic = null;
-        SuccessorFunction operators = new CentralsEnergiaSuccessorFunction1();
+        SuccessorFunction operators = new CentralsEnergiaSuccessorFunction();
 
         int heu = 0;
         switch (heu) {

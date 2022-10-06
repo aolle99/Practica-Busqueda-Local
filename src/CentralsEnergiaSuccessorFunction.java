@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Set;
 
 
-public class CentralsEnergiaSuccessorFunction1 implements SuccessorFunction {
+public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
 
     public List getSuccessors(Object state) {
         Set<Integer> consumidorsZero;
