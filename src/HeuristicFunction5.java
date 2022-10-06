@@ -12,9 +12,8 @@ import aima.search.framework.HeuristicFunction;
 public class HeuristicFunction5 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
-        int retVal = 0;
-
-        return retVal;
+        CentralsEnergiaBoard board = (CentralsEnergiaBoard) state;
+        return board.getEnergiaPerdudaPerDistancia();
 
     }
 }

@@ -245,15 +245,25 @@ public class CentralsEnergiaBoard {
                 entropia += prob * Math.log(prob);
             }
         }
-        return entropia;
+        return -entropia;
     }
 
     public double getMWOcupatsAmbPes() {
         double ocupats = 0;
         for (int i = 0; i < centrals.size(); ++i) {
-            ocupats += Math.log10(centrals.get(i).getProduccion() - mwLliuresCentrals.get(i));
+            ocupats += Math.log(centrals.get(i).getProduccion() - mwLliuresCentrals.get(i)) / Math.log(2);
         }
         return ocupats;
+    }
+
+    public double getEnergiaPerdudaPerDistancia(){
+        double perduda = 0;
+        for (int i = 0; i < assignacionsConsumidors.size(); i++){
+            Cliente client = clients.get(i);
+            Central central = centrals.get(assignacionsConsumidors.get(i));
+            perduda += VEnergia.getPerdida(getDistancia(client, central));
+        }
+        return perduda;
     }
 
     public static ArrayList<Central> getCentrals() {
