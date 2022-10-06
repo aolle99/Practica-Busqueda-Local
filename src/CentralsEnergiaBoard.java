@@ -284,7 +284,7 @@ public class CentralsEnergiaBoard {
         return assignacionsConsumidors.get(idConsumidor);
     }
 
-    public boolean isNoAssignat(int idConsumidor) {
+    public boolean assignedToZero(int idConsumidor) {
         return consumidorsZero.contains(idConsumidor);
     }
 
