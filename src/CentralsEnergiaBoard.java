@@ -120,13 +120,11 @@ public class CentralsEnergiaBoard {
     }
 
     public Boolean generarEstatInicial(int tipus) {
-        switch (tipus) {
-            case 0:
-                return generarEstatInicialLineal();
-            case 1:
-                return generarEstatInicialAleatori();
-        }
-        return true;
+        return switch (tipus) {
+            case 0 -> generarEstatInicialLineal();
+            case 1 -> generarEstatInicialAleatori();
+            default -> true;
+        };
     }
 
     public boolean isGoal() {
