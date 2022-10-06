@@ -9,6 +9,8 @@ public class CentralsEnergiaBoard {
     private static Set<Integer> consumidorsZero;
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
+    private static double SumatoriMWLliures;
+    private static double SumatoriCostTotal;
 
     private Random myRandom;
     private static int assignats=0;
@@ -141,11 +143,11 @@ public class CentralsEnergiaBoard {
     }
 
     public double getCostCentrals() {
-
         double cost = 0;
         for (int i = 0; i < centrals.size(); ++i) {
             // Suma dels costos de les centrals que estan enceses
             Central central = centrals.get(i);
+            // Cost central en marxa
             if (mwLliuresCentrals.get(i) != null &&central.getProduccion() != mwLliuresCentrals.get(i)) {
                 // Sumar costos
                 try {
@@ -156,6 +158,7 @@ public class CentralsEnergiaBoard {
                 }
 
             }
+            // Cost central parada
             else {
                 try {
                     cost += VEnergia.getCosteParada(central.getTipo());
