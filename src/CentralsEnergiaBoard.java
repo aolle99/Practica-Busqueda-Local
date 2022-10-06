@@ -4,16 +4,17 @@ import java.util.*;
 
 public class CentralsEnergiaBoard {
 
-    private static ArrayList<Integer> assignacionsConsumidors;
-    private static ArrayList<Double> mwLliuresCentrals;
-    private static Set<Integer> consumidorsZero;
+    private ArrayList<Integer> assignacionsConsumidors;
+    private ArrayList<Double> mwLliuresCentrals;
+    private Set<Integer> consumidorsZero;
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
-    private static double SumatoriMWLliures;
-    private static double SumatoriCostTotal;
+    private double sumatoriMWLliures;
+    private double sumatoriCostClients;
+    private double sumatoriCostCentrals;
 
     private Random myRandom;
-    private static int assignats=0;
+    private static int assignats = 0;
 
     public CentralsEnergiaBoard() {
         consumidorsZero = new HashSet<>();
@@ -122,11 +123,16 @@ public class CentralsEnergiaBoard {
     }
 
     public Boolean generarEstatInicial(int tipus) {
-        return switch (tipus) {
-            case 0 -> generarEstatInicialLineal();
-            case 1 -> generarEstatInicialAleatori();
-            default -> true;
-        };
+        boolean generat = false;
+        if (tipus == 0) {
+            generat = generarEstatInicialLineal();
+        } else {
+            generat = generarEstatInicialAleatori();
+        }
+        sumatoriMWLliures = getMWLliures();
+        sumatoriCostClients = getCostConsumidors();
+        sumatoriCostCentrals = getCostCentrals();
+        return generat;
     }
 
     public boolean isGoal() {
@@ -203,7 +209,7 @@ public class CentralsEnergiaBoard {
         return cost;
     }
 
-
+    //GETTERS I SETTERS
     public double getMWLliures(){
 
         return mwLliuresCentrals.stream().reduce(0.0, Double::sum);
@@ -237,7 +243,15 @@ public class CentralsEnergiaBoard {
         return clients;
     }
 
-    public static Set<Integer> getConsumidorsZero() {
+    public Set<Integer> getConsumidorsZero() {
         return consumidorsZero;
+    }
+
+    public Double getMwLliuresCentral(int idCentral) {
+        return mwLliuresCentrals.get(idCentral);
+    }
+
+    public int getCentralAssignada(int idConsumidor) {
+        return assignacionsConsumidors.get(idConsumidor);
     }
 }
