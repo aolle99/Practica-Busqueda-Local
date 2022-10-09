@@ -52,7 +52,7 @@ public class CentralsEnergiaBoard {
             double mwLliures = mwLliuresCentrals.get(central_id);
             mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
             if (mwLliures >= 0) {
-                System.out.println("client: " + client_id + ", central: " + central_id);
+                //System.out.println("client: " + client_id + ", central: " + central_id + ", tipus: " + client.getContrato());
                 assignacionsConsumidors.set(client_id, central_id);
                 mwLliuresCentrals.set(central_id, mwLliures);
                 assignat = true;
@@ -89,7 +89,6 @@ public class CentralsEnergiaBoard {
         for (int client_id = 0; client_id < clients.size(); ++client_id) {
             Cliente client = clients.get(client_id);
             if (client.getContrato() == Cliente.GARANTIZADO) {
-                //System.out.println("j: " + j);
                 j = asignarCentral(client_id, j, client, 0);
                 if (j == -1) {
                     return false;
@@ -98,10 +97,8 @@ public class CentralsEnergiaBoard {
                 clientsNoGarantitzats.add(client_id);
             }
         }
-        System.out.println(clientsNoGarantitzats.size());
-        for (int i = 0; i < clientsNoGarantitzats.size(); ++i) {
-            int client_id = clientsNoGarantitzats.get(i);
-            Cliente client = clients.get(clientsNoGarantitzats.get(client_id));
+        for (int client_id : clientsNoGarantitzats) {
+            Cliente client = clients.get(client_id);
             j = asignarCentral(client_id, j, client, 0);
         }
         return true;
@@ -143,8 +140,8 @@ public class CentralsEnergiaBoard {
                 }
                 System.out.println(assignacions);
                 System.out.println("Els clients que no s'han pogut assignar en són " + (consumidorsZero.size()));
+                System.out.println("cost: " + (getCostCentrals() + getCostConsumidors()));
             }
-            //System.out.println(assignacionsConsumidors);
         } else {
             generat = generarEstatInicialAleatori();
         }
