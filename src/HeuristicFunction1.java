@@ -12,7 +12,7 @@ public class HeuristicFunction1 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
         CentralsEnergiaBoard board = (CentralsEnergiaBoard) state;
-        return board.getCostCentrals() + board.getCostConsumidors();
+        return -(board.getCostCentrals() + board.getCostConsumidors());
     }
 
 }

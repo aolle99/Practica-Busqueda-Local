@@ -52,6 +52,7 @@ public class CentralsEnergiaBoard {
             double mwLliures = mwLliuresCentrals.get(central_id);
             mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
             if (mwLliures >= 0) {
+                System.out.println("client: " + client_id + ", central: " + central_id);
                 assignacionsConsumidors.set(client_id, central_id);
                 mwLliuresCentrals.set(central_id, mwLliures);
                 assignat = true;
@@ -71,7 +72,10 @@ public class CentralsEnergiaBoard {
         }
         //No queden centrals
         if (!assignat) {
-            if (caso == 0) assignacionsConsumidors.set(client_id, -1);
+            if (caso == 0) {
+                if (client.getContrato() == Cliente.GARANTIZADO) return -1;
+                assignacionsConsumidors.set(client_id, -1);
+            }
             else if (caso == 1) assignacionsConsumidors.set(client_id, -1);
             consumidorsZero.add(client_id);
         }
@@ -85,6 +89,7 @@ public class CentralsEnergiaBoard {
         for (int client_id = 0; client_id < clients.size(); ++client_id) {
             Cliente client = clients.get(client_id);
             if (client.getContrato() == Cliente.GARANTIZADO) {
+                //System.out.println("j: " + j);
                 j = asignarCentral(client_id, j, client, 0);
                 if (j == -1) {
                     return false;
@@ -93,7 +98,9 @@ public class CentralsEnergiaBoard {
                 clientsNoGarantitzats.add(client_id);
             }
         }
-        for (int client_id = 0; client_id < clientsNoGarantitzats.size(); ++client_id) {
+        System.out.println(clientsNoGarantitzats.size());
+        for (int i = 0; i < clientsNoGarantitzats.size(); ++i) {
+            int client_id = clientsNoGarantitzats.get(i);
             Cliente client = clients.get(clientsNoGarantitzats.get(client_id));
             j = asignarCentral(client_id, j, client, 0);
         }
@@ -127,6 +134,17 @@ public class CentralsEnergiaBoard {
         boolean generat = false;
         if (tipus == 0) {
             generat = generarEstatInicialLineal();
+            if (generat){
+                System.out.println("L'estat inicial lineal s'ha generat correctament");
+                System.out.println("S'han assignat " + (assignacionsConsumidors.size() - consumidorsZero.size())+ " clients, i són els següents:");
+                StringBuilder assignacions = new StringBuilder();
+                for (Integer assignacionsConsumidor : assignacionsConsumidors) {
+                    if (assignacionsConsumidor != -1) assignacions.append(assignacionsConsumidor).append(", ");
+                }
+                System.out.println(assignacions);
+                System.out.println("Els clients que no s'han pogut assignar en són " + (consumidorsZero.size()));
+            }
+            //System.out.println(assignacionsConsumidors);
         } else {
             generat = generarEstatInicialAleatori();
         }
@@ -165,6 +183,7 @@ public class CentralsEnergiaBoard {
             if (mwLliuresCentrals.get(i) != null &&central.getProduccion() != mwLliuresCentrals.get(i)) {
                 // Sumar costos
                 try {
+                    if (mwLliuresCentrals.get(i) < 0) return Integer.MAX_VALUE;
                     cost += VEnergia.getCosteMarcha(central.getTipo());
                     cost += VEnergia.getCosteProduccionMW(central.getTipo());
                 } catch (Exception e) {
@@ -189,7 +208,7 @@ public class CentralsEnergiaBoard {
         double cost = 0;
         for (int i=0; i<clients.size(); ++i) {
             Cliente client = clients.get(i);
-            if (!consumidorsZero.contains(i)){
+            if (!consumidorsZero.contains(i) && assignacionsConsumidors.get(i) != -1){
                 if (client.getContrato()== Cliente.GARANTIZADO){
                     try {
                         cost-=VEnergia.getTarifaClienteGarantizada(client.getTipo());
@@ -207,6 +226,7 @@ public class CentralsEnergiaBoard {
             }
             else {
                 try {
+                    if (client.getContrato()== Cliente.GARANTIZADO) return Integer.MAX_VALUE;
                     cost+=VEnergia.getTarifaClientePenalizacion(client.getTipo());
                 }catch (Exception e) {
                     throw new RuntimeException(e);
