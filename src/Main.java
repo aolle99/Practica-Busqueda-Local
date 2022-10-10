@@ -37,19 +37,19 @@ public class Main {
 
         int heu = 1;
         switch (heu) {
-            case 0:
+            case 1:
                 heuristic = new HeuristicFunction1();
                 break;
-            case 1:
+            case 2:
                 heuristic = new HeuristicFunction2();
                 break;
-            case 2:
+            case 3:
                 heuristic = new HeuristicFunction3();
                 break;
-            case 3:
+            case 4:
                 heuristic = new HeuristicFunction4();
                 break;
-            case 4:
+            case 5:
                 heuristic = new HeuristicFunction5();
                 break;
         }

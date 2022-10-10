@@ -10,6 +10,8 @@ public class CentralsEnergiaBoard {
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
 
+    private double benefici = 0;
+
     private Random myRandom;
 
     public CentralsEnergiaBoard() {
@@ -198,19 +200,19 @@ public class CentralsEnergiaBoard {
                 }
             }
         }
-        return -cost;
+        return cost;
     }
 
 
-    public double getCostConsumidors() {
+    public double getBeneficiConsumidors() {
         double beneficio = 0;
-        for (int i=0; i<clients.size(); ++i) {
+        for (int i = 0; i < clients.size(); ++i) {
             Cliente client = clients.get(i);
-            if (!consumidorsZero.contains(i) && assignacionsConsumidors.get(i) != -1){
-                if (client.getContrato()== Cliente.GARANTIZADO){
+            if (!consumidorsZero.contains(i) && assignacionsConsumidors.get(i) != -1) {
+                if (client.getContrato() == Cliente.GARANTIZADO) {
                     try {
                         beneficio += VEnergia.getTarifaClienteGarantizada(client.getTipo());
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -331,11 +333,11 @@ public class CentralsEnergiaBoard {
 
     public void printResultat() {
         double costCentrals = getCostCentrals();
-        double costConsumidors = getCostConsumidors();
+        double beneficiConsumidors = getBeneficiConsumidors();
         System.out.println("---------------------");
         System.out.println("Coste de las centrales: " + costCentrals + "€");
-        System.out.println("Benefici de los consumidores: " + costConsumidors + "€");
-        System.out.println("Benefici total: " + (costCentrals + costConsumidors) + "€");
+        System.out.println("Benefici de los consumidores: " + beneficiConsumidors + "€");
+        System.out.println("Benefici total: " + (beneficiConsumidors - costCentrals) + "€");
         System.out.println("---------------------");
     }
 

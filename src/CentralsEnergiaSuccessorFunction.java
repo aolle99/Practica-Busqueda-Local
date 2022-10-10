@@ -85,6 +85,7 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
                             estat_successor.getMwLliuresCentrals().set(id_central, mwLliuresOld);
                             estat_successor.getMwLliuresCentrals().set(id_central2, mwLliuresNew);
                             estat_successor.getAssignacionsConsumidors().set(id_client, id_central2);
+
                             // creem el successor
                             String action = "Canviar consumidor " + id_client + " de la central " + id_central + " a la central " + id_central2;
                             successors.add(new Successor(action, estat_successor));
