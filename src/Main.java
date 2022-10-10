@@ -6,7 +6,7 @@ import java.util.Random;
 
 
 public class Main {
-    static final int MAX_TRIES = 100;
+    static final int MAX_TRIES = 1000;
     static Random myRandom;
     static CentralsEnergiaBoard board;
 
@@ -35,7 +35,7 @@ public class Main {
         HeuristicFunction heuristic = null;
         SuccessorFunction operators = new CentralsEnergiaSuccessorFunction();
 
-        int heu = 0;
+        int heu = 1;
         switch (heu) {
             case 0:
                 heuristic = new HeuristicFunction1();

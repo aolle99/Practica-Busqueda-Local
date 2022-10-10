@@ -2,7 +2,10 @@ import aima.search.framework.*;
 import aima.search.informed.HillClimbingSearch;
 import aima.search.informed.SimulatedAnnealingSearch;
 
-import java.util.*;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+import java.util.Properties;
 
 public class CentralsEnergiaSearcher {
 
@@ -33,7 +36,6 @@ public class CentralsEnergiaSearcher {
             d1=new Date();
             agent = new SearchAgent(problem,search);
             d2=new Date();
-
             a= Calendar.getInstance();
             b= Calendar.getInstance();
             a.setTime(d1);
@@ -46,37 +48,14 @@ public class CentralsEnergiaSearcher {
             printInstrumentation(agent.getInstrumentation());
             printActions(agent.getActions());
             CentralsEnergiaBoard board = (CentralsEnergiaBoard) search.getGoalState();
-            System.out.println(board.getCostCentrals() + board.getCostConsumidors() + " €");
+            board.printResultat();
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    private void setInstrumentation(Properties properties)
-    {
-        propietats = "";
-        propietats += "Temps de cerca: "+temps+" ms\n";
-        Iterator<Object> keys = properties.keySet().iterator();
-        if (keys.hasNext()) {
-            String key = (String) keys.next();
-            String property = properties.getProperty(key);
-            propietats += "Nodes expandits: "+property+"\n";
-            nodesexp=property;
-        }
-    }
-    public String getPropietats(){
-        return propietats;
-    }
 
-    private void setAccions(List actions)
-    {
-        accions = "";
-        for (Object o : actions) {
-            String action = (String) o;
-            accions = accions.concat(action + "\n");
-        }
-    }
 
     private static void printInstrumentation(Properties properties) {
         for (Object o : properties.keySet()) {
@@ -93,30 +72,5 @@ public class CentralsEnergiaSearcher {
             System.out.println(action);
         }
     }
-
-    /*public void fitxerResultats(ConnectatBoard board,int estat_inicial,String algoritme,int operadors,int heuristic,int k,int iter,int passos_iter, double lambda){
-        try {
-            File fitxer = new File("resultats.txt");
-            boolean nou=!fitxer.exists();
-            fitxer.createNewFile();
-            FileWriter out = new FileWriter(fitxer,true);
-            if (nou){
-                //noms de variables
-                out.write("N\tM\tncentrals\tnrepetidors\testat_inicial\tmaxrep\talpha\tbeta\tgamma\talgoritme\toperadors\theuristic\tk\titer\tpassos_iter\tlambda\ttemps\tnodes_exp\terror_inicial\terror_final\trepet_usats\n");
-            }
-            ConnectatBoard board_final = getEstatFinal();
-            if (k==-1){
-                // Ser� HillClimbing, no volem variables de SA
-                out.write(""+board.getN()+"\t"+board.getM()+"\t"+board.getNCentrals()+"\t"+board.getNRepetidors()+"\t"+estat_inicial+"\t"+board.getMaxNumRepetidors()+"\t"+board.getAlfa()+"\t"+board.getBeta()+"\t"+board.getGamma()+"\t"+algoritme+"\t"+operadors+"\t"+heuristic+"\t\t\t\t\t"+temps+"\t"+nodesexp+"\t"+board.getErrorTotal()+"\t"+board_final.getErrorTotal()+"\t"+board_final.getNumRepetidors()+"\n");
-            }
-            else
-                out.write(""+board.getN()+"\t"+board.getM()+"\t"+board.getNCentrals()+"\t"+board.getNRepetidors()+"\t"+estat_inicial+"\t"+board.getMaxNumRepetidors()+"\t"+board.getAlfa()+"\t"+board.getBeta()+"\t"+board.getGamma()+"\t"+algoritme+"\t"+operadors+"\t"+heuristic+"\t"+k+"\t"+iter+"\t"+passos_iter+"\t"+lambda+"\t"+temps+"\t"+nodesexp+"\t"+board.getErrorTotal()+"\t"+board_final.getErrorTotal()+"\t"+board_final.getNumRepetidors()+"\n");
-
-            out.close();
-        } catch (Exception e){
-            System.err.println("No s'ha pogut escriure el fitxer de resultats.");
-            System.err.println(e.toString());
-        }
-    }*/
 
 }

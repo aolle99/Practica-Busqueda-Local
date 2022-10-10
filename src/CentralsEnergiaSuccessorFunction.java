@@ -9,32 +9,12 @@ import java.util.List;
 
 
 public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
+    ArrayList<Central> centrals;
+    ArrayList<Cliente> clients;
+    ArrayList<Successor> successors;
+    CentralsEnergiaBoard board;
 
-    public List getSuccessors(Object state) {
-        ArrayList<Central> centrals = CentralsEnergiaBoard.getCentrals();
-        ArrayList<Cliente> clients = CentralsEnergiaBoard.getClients();
-        ArrayList<Successor> successors = new ArrayList<>();
-        CentralsEnergiaBoard board = (CentralsEnergiaBoard) state;
-
-
-        //Treure un consumidor amb prioritat no garantizada d’una central
-        /*for (int id_client = 0; id_client < clients.size(); ++id_client) {
-            Cliente client = clients.get(id_client);
-            if (client.getContrato() == Cliente.NOGARANTIZADO && !board.isNoAssignat(id_client)) {
-                int id_central = board.getCentralAssignada(id_client);
-                CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
-                Central central = centrals.get(id_central);
-                double mwLliures = estat_successor.getMwLliuresCentrals().get(id_central);
-                mwLliures += client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(CentralsEnergiaBoard.getDistancia(client, central));
-                estat_successor.getMwLliuresCentrals().set(id_central, mwLliures);
-                estat_successor.getAssignacionsConsumidors().set(id_client, -1);
-                estat_successor.setNoAssignat(id_client);
-                String action = "Treure consumidor " + id_client + " de la central " + id_central;
-                successors.add(new Successor(action,estat_successor));
-            }
-        } */
-
-        //Swap de dos consumidors de central
+    private void swapConsumidors() {
         for (int id_client1 = 0; id_client1 < clients.size(); ++id_client1) {
             Cliente client1 = clients.get(id_client1);
             if (!board.assignedToZero(id_client1)) {
@@ -68,8 +48,9 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
                 }
             }
         }
+    }
 
-        // Canviar un consumidor de central
+    private void moveConsumidors() {
         for (int id_client = 0; id_client < clients.size(); ++id_client) {
             Cliente client = clients.get(id_client);
             int id_central = board.getCentralAssignada(id_client);
@@ -112,6 +93,20 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
                 }
             }
         }
+    }
+
+    public List getSuccessors(Object state) {
+        centrals = CentralsEnergiaBoard.getCentrals();
+        clients = CentralsEnergiaBoard.getClients();
+        successors = new ArrayList<>();
+        board = (CentralsEnergiaBoard) state;
+
+        //Swap de dos consumidors de central
+        swapConsumidors();
+
+        // Canviar un consumidor de central
+        moveConsumidors();
+        System.out.println("Successors: " + successors.size());
         return successors;
     }
 }
