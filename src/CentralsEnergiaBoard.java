@@ -9,6 +9,7 @@ public class CentralsEnergiaBoard {
     private static ArrayList<Cliente> clients;
     private static Random myRandom;
 
+    /********************** CONSTRUCTORS **********************/
     public CentralsEnergiaBoard() {
         myRandom = new Random();
     }
@@ -17,7 +18,7 @@ public class CentralsEnergiaBoard {
         this.assignacionsConsumidors = new ArrayList<>(board_to_copy.getAssignacionsConsumidors());
     }
 
-
+    /********************** GENERADORS **********************/
     public void generarCentrals(int[] tipos_centrales, int seed) throws Exception {
         centrals = new Centrales(tipos_centrales, seed);
         // La mida d'assignacionsConsumidors es centrals.size() + 1 perquè a l'última posició s'assignaran tots els clients que no siguin subministrats.
@@ -28,47 +29,7 @@ public class CentralsEnergiaBoard {
         clients = new Clientes(ncl, propc, propg, seed);
     }
 
-    public static double getDistancia(Cliente cliente, Central central) {
-        int x = cliente.getCoordX() - central.getCoordX();
-        int y = cliente.getCoordY() - central.getCoordY();
-        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
-    }
 
-    public int getAssignacioCentral(int client_id){
-        // Retorna la central a la que es troba el client, -1 en cas que no estigui assignat el client
-        for (int i = 0; i < centrals.size(); i++){
-            if (assignacionsConsumidors.get(i).contains(client_id)) return i;
-        }
-        return -1;
-    }
-
-    public double getMwLliuresCentral(int central_id){
-        // Retorna els megawatts lliures de la central
-        Central central = centrals.get(central_id);
-        double mw_lliures = central.getProduccion();
-        for (int client_id : assignacionsConsumidors.get(central_id)){
-            Cliente client = clients.get(client_id);
-            mw_lliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
-        }
-        return mw_lliures;
-    }
-
-    public Boolean setAssignacioConsumidor(int central_id, int client_id) {
-        // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
-        double mw_lliures = getMwLliuresCentral(central_id);
-        Cliente client = clients.get(client_id);
-        Central central = centrals.get(central_id);
-        if (mw_lliures - (client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central))) >= 0) {
-            assignacionsConsumidors.get(central_id).add(client_id);
-            return true;
-        }
-        return false;
-    }
-
-    public void setClientExclos(int client_id) {
-        // Assigna el client a la central -1
-        assignacionsConsumidors.get(centrals.size()).add(client_id);
-    }
 
     private int asignarCentralLineal(int client_id, int central_id, Cliente client) {
         while (central_id < centrals.size()) {
@@ -146,7 +107,7 @@ public class CentralsEnergiaBoard {
         }
         return generat;
     }
-
+    /********************** GOAL TEST **********************/
     /*public boolean isGoal() {
         //Una central no té més demanda de la que pot produir (la suma dels consumidors assignats <= producció màxima central);
         for (int i = 0; i < mwLliuresCentrals.size(); i++){
@@ -200,7 +161,6 @@ public class CentralsEnergiaBoard {
         return cost;
     }
 
-
     public double getBeneficiConsumidors() {
         double beneficio = 0;
         for (int i = 0; i < clients.size(); ++i) {
@@ -234,10 +194,86 @@ public class CentralsEnergiaBoard {
         return beneficio;
     }
 
-    //GETTERS I SETTERS
     public double getTotalMWLliures() {
+        double mwLliures = 0;
+        for (int i = 0; i < centrals.size(); ++i) {
+            mwLliures += getMwLliuresCentral(i);
+        }
+        return mwLliures;
+    }
 
-        return mwLliuresCentrals.stream().reduce(0.0, Double::sum);
+    public double getMWEntropia() {
+        double entropia = 0;
+        for (int i = 0; i < centrals.size(); ++i) {
+            double prob = (centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / centrals.get(i).getProduccion();
+            if (prob != 0) {
+                entropia += prob * Math.log(prob);
+            }
+        }
+        return -entropia;
+    }
+
+    public double getMWOcupatsAmbPes() {
+        double ocupats = 0;
+        for (int i = 0; i < centrals.size(); ++i)
+            ocupats += Math.log(centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / Math.log(2);
+
+        return ocupats;
+    }
+
+    public double getEnergiaPerdudaPerDistancia() {
+        double perduda = 0;
+        for (int central_id = 0; central_id < assignacionsConsumidors.size() - 1; central_id++) {
+            for (int client_id = 0; client_id < assignacionsConsumidors.size() - 1; client_id++) {
+                Cliente client = clients.get(client_id);
+                Central central = centrals.get(central_id);
+                perduda += Math.pow(getDistancia(client, central), 2);
+            }
+        }
+        return perduda;
+    }
+
+    /********************** GETTERS I SETTERS **********************/
+    public static double getDistancia(Cliente cliente, Central central) {
+        int x = cliente.getCoordX() - central.getCoordX();
+        int y = cliente.getCoordY() - central.getCoordY();
+        return Math.sqrt(Math.pow(x, 2) + Math.pow(y, 2));
+    }
+
+    public int getAssignacioCentral(int client_id) {
+        // Retorna la central a la que es troba el client, -1 en cas que no estigui assignat el client
+        for (int i = 0; i < centrals.size(); i++) {
+            if (assignacionsConsumidors.get(i).contains(client_id)) return i;
+        }
+        return -1;
+    }
+
+    public double getMwLliuresCentral(int central_id) {
+        // Retorna els megawatts lliures de la central
+        Central central = centrals.get(central_id);
+        double mw_lliures = central.getProduccion();
+        for (int client_id : assignacionsConsumidors.get(central_id)) {
+            Cliente client = clients.get(client_id);
+            mw_lliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
+        }
+        return mw_lliures;
+    }
+
+    public Boolean setAssignacioConsumidor(int central_id, int client_id) {
+        // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
+        double mw_lliures = getMwLliuresCentral(central_id);
+        Cliente client = clients.get(client_id);
+        Central central = centrals.get(central_id);
+        if (mw_lliures - (client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central))) >= 0) {
+            assignacionsConsumidors.get(central_id).add(client_id);
+            return true;
+        }
+        return false;
+    }
+
+    public void setClientExclos(int client_id) {
+        // Assigna el client a la central -1
+        assignacionsConsumidors.get(centrals.size()).add(client_id);
     }
 
     public int getClientsGarantitzatsNoAssignats() {
@@ -248,37 +284,6 @@ public class CentralsEnergiaBoard {
             }
         }
         return count;
-    }
-
-    public double getMWEntropia() {
-        double entropia = 0;
-        for (int i = 0; i < centrals.size(); ++i) {
-            double prob = (centrals.get(i).getProduccion() - mwLliuresCentrals.get(i)) / centrals.get(i).getProduccion();
-            if (prob != 0) {
-                entropia += prob * Math.log(prob);
-            }
-        }
-        return -entropia;
-    }
-
-    public double getMWOcupatsAmbPes() {
-        double ocupats = 0;
-        for (int i = 0; i < centrals.size(); ++i) {
-            ocupats += Math.log(centrals.get(i).getProduccion() - mwLliuresCentrals.get(i)) / Math.log(2);
-        }
-        return ocupats;
-    }
-
-    public double getEnergiaPerdudaPerDistancia(){
-        double perduda = 0;
-        for (int i = 0; i < assignacionsConsumidors.size(); i++){
-            if (assignacionsConsumidors.get(i) != -1) {
-                Cliente client = clients.get(i);
-                Central central = centrals.get(assignacionsConsumidors.get(i));
-                perduda += VEnergia.getPerdida(getDistancia(client, central));
-            }
-        }
-        return perduda;
     }
 
     public static ArrayList<Central> getCentrals() {
@@ -293,7 +298,7 @@ public class CentralsEnergiaBoard {
         return assignacionsConsumidors;
     }
 
-
+    /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
         double costCentrals = getCostCentrals();
         double beneficiConsumidors = getBeneficiConsumidors();
