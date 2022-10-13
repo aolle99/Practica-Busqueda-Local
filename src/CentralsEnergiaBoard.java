@@ -75,7 +75,6 @@ public class CentralsEnergiaBoard {
                 return true;
             }
         }
-        System.out.println("client_id: " + client_id + " assignat a la central: " + central_id);
         return true;
     }
 
@@ -112,20 +111,19 @@ public class CentralsEnergiaBoard {
     /********************** HEURISTIQUES **********************/
     public double getCostCentrals() {
         double cost = 0;
-        for (int i = 0; i < centrals.size(); ++i) {
+        for (int i = 0; i < assignacionsConsumidors.size(); ++i) {
             // Suma dels costos de les centrals que estan enceses
             Central central = centrals.get(i);
             // Cost central en marxa
-            if (mwLliuresCentrals.get(i) != null && central.getProduccion() != mwLliuresCentrals.get(i)) {
+            if (assignacionsConsumidors.get(i).size() > 0) {
                 // Sumar costos
                 try {
-                    if (mwLliuresCentrals.get(i) < 0) return Integer.MAX_VALUE;
+                    if (getMwLliuresCentral(i) < 0) return Integer.MAX_VALUE;
                     cost += VEnergia.getCosteMarcha(central.getTipo());
                     cost += VEnergia.getCosteProduccionMW(central.getTipo());
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-
             }
             // Cost central parada
             else {
@@ -141,32 +139,32 @@ public class CentralsEnergiaBoard {
 
     public double getBeneficiConsumidors() {
         double beneficio = 0;
-        for (int i = 0; i < clients.size(); ++i) {
-            Cliente client = clients.get(i);
-            if (!consumidorsZero.contains(i) && assignacionsConsumidors.get(i) != -1) {
+        for (Set<Integer> clientsCentral : assignacionsConsumidors) {
+            for (int client_id : clientsCentral) {
+                Cliente client = clients.get(client_id);
                 if (client.getContrato() == Cliente.GARANTIZADO) {
                     try {
                         beneficio += VEnergia.getTarifaClienteGarantizada(client.getTipo());
                     } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
-                }
-                else {
+                } else {
                     try {
                         beneficio += VEnergia.getTarifaClienteNoGarantizada(client.getTipo());
-                    }catch (Exception e) {
+                    } catch (Exception e) {
                         throw new RuntimeException(e);
                     }
                 }
             }
-            else {
-                try {
-                    if (client.getContrato()== Cliente.GARANTIZADO) return Integer.MAX_VALUE;
-                    beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo());
-                }catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-
+        }
+        Set<Integer> clientsExclosos = assignacionsConsumidors.get(centrals.size());
+        for (int client_id : clientsExclosos) {
+            Cliente client = clients.get(client_id);
+            try {
+                if (client.getContrato()== Cliente.GARANTIZADO) return Integer.MAX_VALUE;
+                beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo());
+            }catch (Exception e) {
+                throw new RuntimeException(e);
             }
         }
         return beneficio;
@@ -254,7 +252,6 @@ public class CentralsEnergiaBoard {
         // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
         double mw_lliures = getMwLliuresCentral(central_id);
         if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
-            System.out.println("Assignant client: " + client_id + " a la central: " + central_id);
             assignacionsConsumidors.get(central_id).add(client_id);
             return true;
         }
