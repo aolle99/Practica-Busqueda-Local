@@ -254,9 +254,24 @@ public class CentralsEnergiaBoard {
         double mw_lliures = central.getProduccion();
         for (int client_id : assignacionsConsumidors.get(central_id)) {
             Cliente client = clients.get(client_id);
-            mw_lliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
+            mw_lliures -= getConsumMwClientACentral(client_id, central_id);
         }
         return mw_lliures;
+    }
+
+    public double getMwLliuresCentralAmbNouConsumidor(int central_id, int client_id) {
+        // Retorna els megawatts lliures de la central
+        double mwLliures = getMwLliuresCentral(central_id);
+        Cliente client = clients.get(client_id);
+        Central central = centrals.get(central_id);
+        mwLliures -= getConsumMwClientACentral(client_id, central_id);
+        return mwLliures;
+    }
+
+    public double getConsumMwClientACentral(int client_id, int central_id) {
+        Cliente client = clients.get(client_id);
+        Central central = centrals.get(central_id);
+        return client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
     }
 
     public Boolean setAssignacioConsumidor(int central_id, int client_id) {
@@ -264,7 +279,7 @@ public class CentralsEnergiaBoard {
         double mw_lliures = getMwLliuresCentral(central_id);
         Cliente client = clients.get(client_id);
         Central central = centrals.get(central_id);
-        if (mw_lliures - (client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central))) >= 0) {
+        if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
             assignacionsConsumidors.get(central_id).add(client_id);
             return true;
         }
@@ -298,6 +313,10 @@ public class CentralsEnergiaBoard {
         return assignacionsConsumidors;
     }
 
+    public boolean isCentralExcluida(int central_id) {
+        return central_id == centrals.size();
+    }
+
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
         double costCentrals = getCostCentrals();
@@ -310,4 +329,43 @@ public class CentralsEnergiaBoard {
     }
 
 
+    public boolean canSwap(int client1_id, int client2_id) {
+        int central1_id = getAssignacioCentral(client1_id);
+        int central2_id = getAssignacioCentral(client2_id);
+        if (central1_id == -1 || central2_id == -1) return false;
+        if (central1_id == central2_id) return false;
+        if ((isCentralExcluida(central1_id) && clients.get(client2_id).getContrato() == Cliente.GARANTIZADO)
+                || isCentralExcluida(central2_id) && clients.get(client1_id).getContrato() == Cliente.GARANTIZADO)
+            return false;
+        if (!isCentralExcluida(central1_id) && getMwLliuresCentralAmbNouConsumidor(central1_id, client2_id) + getConsumMwClientACentral(client2_id, central2_id) < 0)
+            return false;
+        if (!isCentralExcluida(central2_id) && getMwLliuresCentralAmbNouConsumidor(central2_id, client1_id) + getConsumMwClientACentral(client1_id, central1_id) < 0)
+            return false;
+        return true;
+    }
+
+    public void swap(int client1_id, int client2_id) {
+        int central1_id = getAssignacioCentral(client1_id);
+        int central2_id = getAssignacioCentral(client2_id);
+
+        assignacionsConsumidors.get(central1_id).remove(client1_id);
+        assignacionsConsumidors.get(central2_id).remove(client2_id);
+        setAssignacioConsumidor(central1_id, client2_id);
+        setAssignacioConsumidor(central2_id, client1_id);
+
+    }
+
+    public boolean canMove(int id_client, int id_central) {
+        if (getAssignacioCentral(id_client) == id_central) return false;
+        if (isCentralExcluida(id_central) && clients.get(id_client).getContrato() == Cliente.GARANTIZADO) return false;
+        if (!isCentralExcluida(id_central) && getMwLliuresCentralAmbNouConsumidor(id_central, id_client) < 0)
+            return false;
+        return true;
+    }
+
+    public void move(int id_client, int id_central) {
+        int old_central = getAssignacioCentral(id_client);
+        assignacionsConsumidors.get(old_central).remove(id_client);
+        setAssignacioConsumidor(id_central, id_client);
+    }
 }
