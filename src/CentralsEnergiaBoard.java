@@ -65,6 +65,12 @@ public class CentralsEnergiaBoard {
         return false;
     }
 
+    public void setClientExclos(int client_id){
+        // Assigna el client a la central -1
+        assignacionsConsumidors.get(centrals.size()).add(client_id);
+    }
+
+    /*
     private int asignarCentralLineal(int client_id, int central_id, Cliente client, int caso) {
         int tries = 0;
         boolean assignat = false;
@@ -101,8 +107,8 @@ public class CentralsEnergiaBoard {
             consumidorsZero.add(client_id);
         }
         return central_id;
-    }
-
+    }*/
+/*
     private Boolean generarEstatInicialLineal() {
         int j = 0;
         ArrayList<Integer> clientsNoGarantitzats = new ArrayList<>();
@@ -123,7 +129,7 @@ public class CentralsEnergiaBoard {
             j = asignarCentral(client_id, j, client, 0);
         }
         return true;
-    }
+    }*/
 
     private int asignarCentralAleatori(int client_id, int central_id, Cliente client, int caso) {
         return 1;
