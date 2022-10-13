@@ -1,6 +1,9 @@
 import IA.Energia.*;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 public class CentralsEnergiaBoard {
 
@@ -64,7 +67,6 @@ public class CentralsEnergiaBoard {
         int tries = 0;
         while (!setAssignacioConsumidor(central_id, client_id)) {
             if (tries < 10000) {
-                double consum_client = client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, centrals.get(central_id)));
                 central_id = new Random().nextInt(centrals.size());
                 ++tries;
             } else {
@@ -107,39 +109,14 @@ public class CentralsEnergiaBoard {
         return generat;
     }
 
-
-    /********************** GOAL TEST **********************/
-    /*public boolean isGoal() {
-        //Una central no té més demanda de la que pot produir (la suma dels consumidors assignats <= producció màxima central);
-        for (int i = 0; i < mwLliuresCentrals.size(); i++){
-            if (mwLliuresCentrals.get(i) < 0) return false;
-            if (mwLliuresCentrals.get(i) > centrals.get(i).getProduccion()) return false;
-        }
-
-        // Si una central està encesa (té algun client assignat), llavors genera tota la producció (tot el cost).
-        for (int i = 0; i < mwLliuresCentrals.size(); i++){
-            if (mwLliuresCentrals.get(i) == centrals.get(i).getProduccion()){
-                for (Integer assignacionsConsumidor : assignacionsConsumidors) {
-                    if (assignacionsConsumidor == i) return false;
-                }
-            }
-        }
-
-        // Els clients de servei garantit, han de ser servits sempre
-        for (int i = 0; i < consumidorsZero.size(); i++){
-            if (clients.get(i).getContrato() == Cliente.GARANTIZADO) return false;
-        }
-        return true;
-    } */
-
     /********************** HEURISTIQUES **********************/
-    /*public double getCostCentrals() {
+    public double getCostCentrals() {
         double cost = 0;
         for (int i = 0; i < centrals.size(); ++i) {
             // Suma dels costos de les centrals que estan enceses
             Central central = centrals.get(i);
             // Cost central en marxa
-            if (mwLliuresCentrals.get(i) != null &&central.getProduccion() != mwLliuresCentrals.get(i)) {
+            if (mwLliuresCentrals.get(i) != null && central.getProduccion() != mwLliuresCentrals.get(i)) {
                 // Sumar costos
                 try {
                     if (mwLliuresCentrals.get(i) < 0) return Integer.MAX_VALUE;
@@ -254,9 +231,7 @@ public class CentralsEnergiaBoard {
         Central central = centrals.get(central_id);
         double mw_lliures = central.getProduccion();
         Set<Integer> clientsCentralX = assignacionsConsumidors.get(central_id);
-        Iterator<Integer> it = clientsCentralX.iterator();
-        while (it.hasNext()) {
-            int client_id = it.next();
+        for (int client_id : clientsCentralX) {
             mw_lliures -= getConsumMwClientACentral(client_id, central_id);
         }
         return mw_lliures;
@@ -265,8 +240,6 @@ public class CentralsEnergiaBoard {
     public double getMwLliuresCentralAmbNouConsumidor(int central_id, int client_id) {
         // Retorna els megawatts lliures de la central
         double mwLliures = getMwLliuresCentral(central_id);
-        Cliente client = clients.get(client_id);
-        Central central = centrals.get(central_id);
         mwLliures -= getConsumMwClientACentral(client_id, central_id);
         return mwLliures;
     }
@@ -280,8 +253,6 @@ public class CentralsEnergiaBoard {
     public Boolean setAssignacioConsumidor(int central_id, int client_id) {
         // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
         double mw_lliures = getMwLliuresCentral(central_id);
-        Cliente client = clients.get(client_id);
-        Central central = centrals.get(central_id);
         if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
             System.out.println("Assignant client: " + client_id + " a la central: " + central_id);
             assignacionsConsumidors.get(central_id).add(client_id);
@@ -293,16 +264,6 @@ public class CentralsEnergiaBoard {
     public void setClientExclos(int client_id) {
         // Assigna el client a la central -1
         assignacionsConsumidors.get(centrals.size()).add(client_id);
-    }
-
-    public int getClientsGarantitzatsNoAssignats() {
-        int count = 0;
-        for (int i = 0; i < assignacionsConsumidors.size(); ++i) {
-            if (assignacionsConsumidors.get(i) == null && clients.get(i).getContrato() == Cliente.GARANTIZADO) {
-                count++;
-            }
-        }
-        return count;
     }
 
     public static ArrayList<Central> getCentrals() {
@@ -323,12 +284,12 @@ public class CentralsEnergiaBoard {
 
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
-        //double costCentrals = getCostCentrals();
-        //double beneficiConsumidors = getBeneficiConsumidors();
+        double costCentrals = getCostCentrals();
+        double beneficiConsumidors = getBeneficiConsumidors();
         System.out.println("---------------------");
-        //System.out.println("Coste de las centrales: " + costCentrals + "€");
-        //System.out.println("Benefici de los consumidores: " + beneficiConsumidors + "€");
-        //System.out.println("Benefici total: " + (beneficiConsumidors - costCentrals) + "€");
+        System.out.println("Coste de las centrales: " + costCentrals + "€");
+        System.out.println("Benefici de los consumidores: " + beneficiConsumidors + "€");
+        System.out.println("Benefici total: " + (beneficiConsumidors - costCentrals) + "€");
         System.out.println("---------------------");
     }
 
