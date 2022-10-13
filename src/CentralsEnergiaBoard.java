@@ -279,9 +279,11 @@ public class CentralsEnergiaBoard {
     public double getEnergiaPerdudaPerDistancia(){
         double perduda = 0;
         for (int i = 0; i < assignacionsConsumidors.size(); i++){
-            Cliente client = clients.get(i);
-            Central central = centrals.get(assignacionsConsumidors.get(i));
-            perduda += VEnergia.getPerdida(getDistancia(client, central));
+            if (assignacionsConsumidors.get(i) != -1) {
+                Cliente client = clients.get(i);
+                Central central = centrals.get(assignacionsConsumidors.get(i));
+                perduda += VEnergia.getPerdida(getDistancia(client, central));
+            }
         }
         return perduda;
     }
