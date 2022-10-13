@@ -53,7 +53,7 @@ public class CentralsEnergiaBoard {
         return mw_lliures;
     }
 
-    public Boolean setAssignacionsConsumidors(int central_id, int client_id) {
+    public Boolean setAssignacioConsumidor(int central_id, int client_id) {
         // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
         double mw_lliures = getMwLliuresCentral(central_id);
         Cliente client = clients.get(client_id);
@@ -65,71 +65,38 @@ public class CentralsEnergiaBoard {
         return false;
     }
 
-    public void setClientExclos(int client_id){
+    public void setClientExclos(int client_id) {
         // Assigna el client a la central -1
         assignacionsConsumidors.get(centrals.size()).add(client_id);
     }
 
-    /*
-    private int asignarCentralLineal(int client_id, int central_id, Cliente client, int caso) {
-        int tries = 0;
-        boolean assignat = false;
-        while (central_id < centrals.size() && !assignat) {
-            Central central = centrals.get(central_id);
-            double mwLliures = mwLliuresCentrals.get(central_id);
-            mwLliures -= client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client, central));
-            if (mwLliures >= 0) {
-                //System.out.println("client: " + client_id + ", central: " + central_id + ", tipus: " + client.getContrato());
-                assignacionsConsumidors.set(client_id, central_id);
-                mwLliuresCentrals.set(central_id, mwLliures);
-                assignat = true;
-            } else {
-                if (caso == 0) {
-                    central_id += 1;
-                }
-                else if(caso == 1) {
-                    if(tries < 10) {
-                        central_id = new Random().nextInt(centrals.size());
-                        ++tries;
-                    } else {
-                        if (client.getContrato() == Cliente.GARANTIZADO) return -1;
-                    }
-                }
-            }
+    private int asignarCentralLineal(int client_id, int central_id, Cliente client) {
+        while (central_id < centrals.size()) {
+            if (setAssignacioConsumidor(central_id, client_id)) return central_id;
+            else central_id += 1;
         }
         //No queden centrals
-        if (!assignat) {
-            if (caso == 0) {
-                if (client.getContrato() == Cliente.GARANTIZADO) return -1;
-                assignacionsConsumidors.set(client_id, -1);
-            }
-            else if (caso == 1) assignacionsConsumidors.set(client_id, -1);
-            consumidorsZero.add(client_id);
-        }
+        if (client.getContrato() == Cliente.GARANTIZADO) return -1;
+        setClientExclos(client_id);
         return central_id;
-    }*/
-/*
+    }
+
     private Boolean generarEstatInicialLineal() {
         int j = 0;
         ArrayList<Integer> clientsNoGarantitzats = new ArrayList<>();
 
         for (int client_id = 0; client_id < clients.size(); ++client_id) {
             Cliente client = clients.get(client_id);
-            if (client.getContrato() == Cliente.GARANTIZADO) {
-                j = asignarCentral(client_id, j, client, 0);
-                if (j == -1) {
-                    return false;
-                }
-            } else {
-                clientsNoGarantitzats.add(client_id);
-            }
+            if (client.getContrato() == Cliente.GARANTIZADO)
+                if ((j = asignarCentralLineal(client_id, j, client)) == -1) return false;
+                else clientsNoGarantitzats.add(client_id);
         }
         for (int client_id : clientsNoGarantitzats) {
             Cliente client = clients.get(client_id);
-            j = asignarCentral(client_id, j, client, 0);
+            j = asignarCentralLineal(client_id, j, client);
         }
         return true;
-    }*/
+    }
 
     private int asignarCentralAleatori(int client_id, int central_id, Cliente client, int caso) {
         return 1;
@@ -180,7 +147,7 @@ public class CentralsEnergiaBoard {
         return generat;
     }
 
-    public boolean isGoal() {
+    /*public boolean isGoal() {
         //Una central no té més demanda de la que pot produir (la suma dels consumidors assignats <= producció màxima central);
         for (int i = 0; i < mwLliuresCentrals.size(); i++){
             if (mwLliuresCentrals.get(i) < 0) return false;
@@ -201,7 +168,7 @@ public class CentralsEnergiaBoard {
             if (clients.get(i).getContrato() == Cliente.GARANTIZADO) return false;
         }
         return true;
-    }
+    } */
 
     /********************** HEURISTIQUES **********************/
     public double getCostCentrals() {
