@@ -22,7 +22,7 @@ public class CentralsEnergiaBoard {
     public void generarCentrals(int[] tipos_centrales, int seed) throws Exception {
         centrals = new Centrales(tipos_centrales, seed);
         // La mida d'assignacionsConsumidors es centrals.size() + 1 perquè a l'última posició s'assignaran tots els clients que no siguin subministrats.
-        assignacionsConsumidors = new ArrayList<>(centrals.size()+1);
+        assignacionsConsumidors = new ArrayList<>(centrals.size() + 1);
         for (int i = 0; i < centrals.size() + 1; i++) {
             assignacionsConsumidors.add(new HashSet<>());
         }
@@ -32,31 +32,30 @@ public class CentralsEnergiaBoard {
         clients = new Clientes(ncl, propc, propg, seed);
     }
 
-    private int asignarCentralLineal(int client_id, int central_id, Cliente client) {
-        System.out.println("---------------- Assignant client " + client_id + " a la central " + central_id + " ----------------");
+    private int asignarCentralLineal(int client_id, int central_id) {
+        Cliente client = clients.get(client_id);
         while (central_id < centrals.size()) {
             if (setAssignacioConsumidor(central_id, client_id)) return central_id;
             else central_id += 1;
         }
         //No queden centrals
         if (client.getContrato() == Cliente.GARANTIZADO) return -1;
+
         setClientExclos(client_id);
         return central_id;
     }
 
     private Boolean generarEstatInicialLineal() {
         int j = 0;
-        ArrayList<Integer> clientsNoGarantitzats = new ArrayList<>();
-
+        HashSet<Integer> clientsNoGarantitzats = new HashSet<>();
         for (int client_id = 0; client_id < clients.size(); ++client_id) {
             Cliente client = clients.get(client_id);
-            if (client.getContrato() == Cliente.GARANTIZADO)
-                if ((j = asignarCentralLineal(client_id, j, client)) == -1) return false;
-                else clientsNoGarantitzats.add(client_id);
+            if (client.getContrato() == Cliente.GARANTIZADO) {
+                if ((j = asignarCentralLineal(client_id, j)) == -1) return false;
+            } else clientsNoGarantitzats.add(client_id);
         }
         for (int client_id : clientsNoGarantitzats) {
-            Cliente client = clients.get(client_id);
-            j = asignarCentralLineal(client_id, j, client);
+            j = asignarCentralLineal(client_id, j);
         }
         return true;
     }
@@ -93,7 +92,7 @@ public class CentralsEnergiaBoard {
         for (int client_id : clientsNoGarantitzatsRandom) {
             Cliente client = clients.get(client_id);
             int central_random = new Random().nextInt(ncentrals);
-            Boolean a = assignarCentralAleatori(client_id, central_random, client);
+            assignarCentralAleatori(client_id, central_random, client);
         }
         return true;
     }
