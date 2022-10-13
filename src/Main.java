@@ -6,7 +6,7 @@ import java.util.Random;
 
 
 public class Main {
-    static final int MAX_TRIES = 1000;
+    static final int MAX_TRIES = 10000;
     static Random myRandom;
     static CentralsEnergiaBoard board;
 
@@ -23,36 +23,25 @@ public class Main {
                 tries++;
             }
             if (tries == MAX_TRIES) throw new Exception("No s'ha pogut generar l'estat inicial");
-            //hillClimbing();
+            hillClimbing();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
     }
-}
-/*
+
     private static void hillClimbing() {
         //Declarem variables
         CentralsEnergiaSearcher searcher;
         HeuristicFunction heuristic = null;
-        //SuccessorFunction operators = new CentralsEnergiaSuccessorFunction();
+        SuccessorFunction operators = new CentralsEnergiaSuccessorFunction();
 
-        int heu = 5;
+        int heu = 1;
         switch (heu) {
-            case 1:
-                heuristic = new HeuristicFunction1();
-                break;
-            case 2:
-                heuristic = new HeuristicFunction2();
-                break;
-            case 3:
-                heuristic = new HeuristicFunction3();
-                break;
-            case 4:
-                heuristic = new HeuristicFunction4();
-                break;
-            case 5:
-                heuristic = new HeuristicFunction5();
-                break;
+            case 1 -> heuristic = new HeuristicFunction1();
+            case 2 -> heuristic = new HeuristicFunction2();
+            case 3 -> heuristic = new HeuristicFunction3();
+            case 4 -> heuristic = new HeuristicFunction4();
+            case 5 -> heuristic = new HeuristicFunction5();
         }
         try {
             searcher = new CentralsEnergiaSearcher(board, operators, heuristic);
@@ -62,4 +51,4 @@ public class Main {
             System.err.println(e.getMessage());
         }
     }
-}*/
+}
