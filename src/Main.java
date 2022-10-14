@@ -36,7 +36,7 @@ public class Main {
         HeuristicFunction heuristic = null;
         SuccessorFunction operators = new CentralsEnergiaSuccessorFunction();
 
-        int heu = 1;
+        int heu = 5;
         switch (heu) {
             case 1 -> heuristic = new HeuristicFunction1();
             case 2 -> heuristic = new HeuristicFunction2();

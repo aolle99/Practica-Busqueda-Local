@@ -20,7 +20,11 @@ public class CentralsEnergiaBoard {
     }
 
     public CentralsEnergiaBoard(CentralsEnergiaBoard board_to_copy) {
-        assignacionsConsumidors = (ArrayList<Set<Integer>>) board_to_copy.getAssignacionsConsumidors().clone();
+        assignacionsConsumidors = new ArrayList<>();
+        for(Set<Integer> oldSet : board_to_copy.getAssignacionsConsumidors()) {
+            HashSet<Integer> newSet = new HashSet<>(oldSet);
+            assignacionsConsumidors.add(newSet);
+        }
     }
 
     /********************** GENERADORS **********************/
