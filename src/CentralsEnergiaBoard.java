@@ -20,11 +20,7 @@ public class CentralsEnergiaBoard {
     }
 
     public CentralsEnergiaBoard(CentralsEnergiaBoard board_to_copy) {
-        ArrayList<Set<Integer>> originalBoard = board_to_copy.getAssignacionsConsumidors();
-        assignacionsConsumidors = new ArrayList<>(centrals.size() + 1);
-        for (int i = 0; i <= centrals.size(); ++i) {
-            assignacionsConsumidors.add(new HashSet<>(originalBoard.get(i)));
-        }
+        assignacionsConsumidors = (ArrayList<Set<Integer>>) board_to_copy.getAssignacionsConsumidors().clone();
     }
 
     /********************** GENERADORS **********************/
@@ -219,8 +215,9 @@ public class CentralsEnergiaBoard {
         int central1_id = getAssignacioCentral(client1_id);
         int central2_id = getAssignacioCentral(client2_id);
         if (central1_id == central2_id) return false;
-        if ((isCentralExcluida(central1_id) && clients.get(client2_id).getContrato() == Cliente.GARANTIZADO)
-                || isCentralExcluida(central2_id) && clients.get(client1_id).getContrato() == Cliente.GARANTIZADO)
+        if (isCentralExcluida(central1_id) && clients.get(client2_id).getContrato() == Cliente.GARANTIZADO)
+            return false;
+        if (isCentralExcluida(central2_id) && clients.get(client1_id).getContrato() == Cliente.GARANTIZADO)
             return false;
         if (!isCentralExcluida(central1_id) && getMwLliuresCentralAmbNouConsumidor(central1_id, client2_id) + getConsumMwClientACentral(client1_id, central1_id) < 0)
             return false;
