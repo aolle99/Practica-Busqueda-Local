@@ -17,12 +17,12 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
 
     private void swapConsumidors() {
         for (int client1_id = 0; client1_id < clients.size(); ++client1_id) {
-            int central1_id = board.getAssignacioCentral(client1_id);
             for (int client2_id = client1_id + 1; client2_id < clients.size(); ++client2_id) {
-                int central2_id = board.getAssignacioCentral(client2_id);
                 if (board.canSwap(client1_id, client2_id)) {
                     CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
                     estat_successor.swap(client1_id, client2_id);
+                    int central2_id = board.getAssignacioCentral(client2_id);
+                    int central1_id = board.getAssignacioCentral(client1_id);
                     String action = "Swap consumidor " + client1_id + " de la central " + central1_id + " amb consumidor " + client2_id + " de la central " + central2_id;
                     successors.add(new Successor(action, estat_successor));
                 }

@@ -23,6 +23,7 @@ public class Main {
                 tries++;
             }
             if (tries == MAX_TRIES) throw new Exception("No s'ha pogut generar l'estat inicial");
+            board.printResultat();
             hillClimbing();
         } catch (Exception e) {
             throw new RuntimeException(e);

@@ -20,7 +20,11 @@ public class CentralsEnergiaBoard {
     }
 
     public CentralsEnergiaBoard(CentralsEnergiaBoard board_to_copy) {
-        this.assignacionsConsumidors = new ArrayList<>(board_to_copy.getAssignacionsConsumidors());
+        ArrayList<Set<Integer>> originalBoard = board_to_copy.getAssignacionsConsumidors();
+        assignacionsConsumidors = new ArrayList<>(centrals.size() + 1);
+        for (int i = 0; i <= centrals.size(); ++i) {
+            assignacionsConsumidors.add(new HashSet<>(originalBoard.get(i)));
+        }
     }
 
     /********************** GENERADORS **********************/
@@ -324,17 +328,22 @@ public class CentralsEnergiaBoard {
         return central_id == centrals.size();
     }
 
+    private int getClientesNoAsignados() {
+        return assignacionsConsumidors.get(centrals.size()).size();
+    }
+
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
         double costCentrals = getCostCentrals();
         double beneficiConsumidors = getBeneficiConsumidors();
+        int clientesNoAsignados = getClientesNoAsignados();
         System.out.println("---------------------");
         System.out.println("Coste de las centrales: " + costCentrals + "€");
         System.out.println("Benefici de los consumidores: " + beneficiConsumidors + "€");
         System.out.println("Benefici total: " + (beneficiConsumidors - costCentrals) + "€");
+        System.out.println("Clientes asignados: " + (clients.size() - clientesNoAsignados) + "/" + clients.size());
         System.out.println("---------------------");
     }
-
 
 
 }
