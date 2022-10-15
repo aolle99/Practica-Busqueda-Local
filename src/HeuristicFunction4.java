@@ -11,8 +11,8 @@ import aima.search.framework.HeuristicFunction;
 public class HeuristicFunction4 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
-        CentralsEnergiaBoard board = (CentralsEnergiaBoard) state;
-        return board.getMWOcupatsAmbPes();
+        Board board = (Board) state;
+        return -board.getMWOcupatsAmbPes();
     }
 
 }

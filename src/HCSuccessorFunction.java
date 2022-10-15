@@ -9,17 +9,17 @@ import java.util.Date;
 import java.util.List;
 
 
-public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
+public class HCSuccessorFunction implements SuccessorFunction {
     ArrayList<Central> centrals;
     ArrayList<Cliente> clients;
     ArrayList<Successor> successors;
-    CentralsEnergiaBoard board;
+    Board board;
 
     private void swapConsumidors() {
-        for (int client1_id = 0; client1_id < clients.size(); ++client1_id) {
-            for (int client2_id = client1_id + 1; client2_id < clients.size(); ++client2_id) {
+        for (short client1_id = 0; client1_id < clients.size(); ++client1_id) {
+            for (short client2_id = (short) (client1_id + 1); client2_id < clients.size(); ++client2_id) {
                 if (board.canSwap(client1_id, client2_id)) {
-                    CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
+                    Board estat_successor = new Board(board);
                     estat_successor.swap(client1_id, client2_id);
                     int central2_id = board.getAssignacioCentral(client2_id);
                     int central1_id = board.getAssignacioCentral(client1_id);
@@ -31,10 +31,10 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
     }
 
     private void moveConsumidors() {
-        for (int id_client = 0; id_client < clients.size(); ++id_client) {
+        for (short id_client = 0; id_client < clients.size(); ++id_client) {
             for (int id_central = 0; id_central < centrals.size(); ++id_central) {
                 if (board.canMove(id_client, id_central)) {
-                    CentralsEnergiaBoard estat_successor = new CentralsEnergiaBoard(board);
+                    Board estat_successor = new Board(board);
                     estat_successor.move(id_client, id_central);
                     String action = "Mou consumidor " + id_client + " a la central " + id_central;
                     successors.add(new Successor(action, estat_successor));
@@ -44,10 +44,10 @@ public class CentralsEnergiaSuccessorFunction implements SuccessorFunction {
     }
 
     public List<Successor> getSuccessors(Object state) {
-        centrals = CentralsEnergiaBoard.getCentrals();
-        clients = CentralsEnergiaBoard.getClients();
+        centrals = Board.getCentrals();
+        clients = Board.getClients();
         successors = new ArrayList<>();
-        board = (CentralsEnergiaBoard) state;
+        board = (Board) state;
         Date d1, d2;
         Calendar a, b;
 
