@@ -11,7 +11,7 @@ import aima.search.framework.HeuristicFunction;
 public class HeuristicFunction1 implements HeuristicFunction {
     public double getHeuristicValue(Object state) {
         Board board = (Board) state;
-        return -(board.getBeneficiConsumidors() - board.getCostCentrals());
+        return -board.getBenefici();
     }
 
 }

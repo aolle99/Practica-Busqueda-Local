@@ -53,7 +53,7 @@ public class HCSuccessorFunction implements SuccessorFunction {
 
         d1 = new Date();
         //Swap de dos consumidors de central
-        //swapConsumidors();
+        swapConsumidors();
 
         // Canviar un consumidor de central
         moveConsumidors();
