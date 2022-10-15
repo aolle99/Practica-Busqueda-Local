@@ -2,6 +2,7 @@ import IA.Energia.*;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Random;
 
@@ -48,10 +49,10 @@ public class Board {
         clients = new Clientes(ncl, propc, propg, seed);
         numClients = clients.size();
         distancies = new ArrayList<>(numCentrals);
-        for (int i = 0; i < numCentrals; i++) {
+        for (int i = 0; i < numClients; i++) {
             distancies.add(new ArrayList<>(numClients));
-            for (int j = 0; j < numClients; j++) {
-                distancies.get(i).add(calcularDistancia(clients.get(j), centrals.get(i)));
+            for (int j = 0; j < numCentrals; j++) {
+                distancies.get(i).add(calcularDistancia(clients.get(i), centrals.get(j)));
             }
         }
     }
@@ -117,12 +118,52 @@ public class Board {
         return true;
     }
 
-    public Boolean generarEstatInicial(int tipus) {
-        if (tipus == 0) {
-            return generarEstatInicialLineal();
-        } else {
-            return generarEstatInicialAleatori();
+    private Boolean assignarCentralGreedy(int client_id) {
+        int central_id = 0;
+        double min_distancia = Double.MAX_VALUE;
+        HashSet<Integer> centrals_intentades = new HashSet<>();
+        for (int it = 0; it < numCentrals; ++it) {
+            for (int i = 0; i < numCentrals; ++i) {
+                if (!centrals_intentades.contains(i)) {
+                    if (distancies.get(client_id).get(i) < min_distancia) {
+                        min_distancia = distancies.get(client_id).get(i);
+                        central_id = i;
+                    }
+                }
+            }
+            centrals_intentades.add(central_id);
+            if (setAssignacioConsumidor(central_id, client_id)) return true;
+
         }
+        return false;
+    }
+
+    private Boolean generarEstatInicialGreedy() {
+        ArrayList<Integer> clientsNoGarantitzats = new ArrayList<>();
+        for (int client_id = 0; client_id < numClients; ++client_id) {
+            Cliente client = clients.get(client_id);
+            if (client.getContrato() == Cliente.GARANTIZADO) {
+                System.out.println("Client " + client_id + " garantitzat");
+                if (!assignarCentralGreedy(client_id)) return false;
+            } else clientsNoGarantitzats.add(client_id);
+
+        }
+        for (int client_id : clientsNoGarantitzats) {
+            if (!assignarCentralGreedy(client_id)) setClientExclos(client_id);
+        }
+        return true;
+    }
+
+    public Boolean generarEstatInicial(int tipus) {
+        if (tipus == 1) {
+            return generarEstatInicialLineal();
+        } else if (tipus == 2) {
+            return generarEstatInicialAleatori();
+        } else if (tipus == 3) {
+            return generarEstatInicialGreedy();
+        }
+        System.out.println("Error: tipus d'estat inicial incorrecte");
+        return false;
     }
 
     /********************** HEURISTIQUES **********************/
@@ -337,7 +378,7 @@ public class Board {
     }
 
     public static double getDistancia(Integer client_id, Integer central_id) {
-        return distancies.get(central_id).get(client_id);
+        return distancies.get(client_id).get(central_id);
     }
 
     public int getCentralsApagades() {
