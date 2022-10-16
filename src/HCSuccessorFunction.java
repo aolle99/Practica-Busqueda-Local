@@ -16,8 +16,8 @@ public class HCSuccessorFunction implements SuccessorFunction {
     Board board;
 
     private void swapConsumidors() {
-        for (short client1_id = 0; client1_id < clients.size(); ++client1_id) {
-            for (short client2_id = (short) (client1_id + 1); client2_id < clients.size(); ++client2_id) {
+        for (int client1_id = 0; client1_id < clients.size(); ++client1_id) {
+            for (int client2_id = client1_id + 1; client2_id < clients.size(); ++client2_id) {
                 int central1_id = board.getAssignacioCentral(client1_id);
                 int central2_id = board.getAssignacioCentral(client2_id);
                 if (board.canSwap(client1_id, client2_id, central1_id, central2_id)) {
