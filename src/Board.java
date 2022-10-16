@@ -258,10 +258,11 @@ public class Board {
 
     public double getEnergiaPerdudaPerDistancia() {
         double perduda = 0;
-        for (int i = 0; i < numClients; i++){
+        for (int i = 0; i < numClients; i++) {
             Cliente client = clients.get(i);
             int central_id = getAssignacioCentral(i);
-            perduda += client.getConsumo() * VEnergia.getPerdida(getDistancia(i, central_id));
+            if (central_id != numCentrals)
+                perduda += client.getConsumo() * VEnergia.getPerdida(getDistancia(i, central_id));
         }
         return perduda;
     }
