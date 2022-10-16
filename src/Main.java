@@ -10,7 +10,7 @@ public class Main {
     //Indica el número de iteraciones que se realizarán per a generar l'estat inicial.
     static final int MAX_TRIES = 999999;
     //Paràmetre que permet executar el codi varies vegades, per tal de
-    static final int REPLIQUES = 30;
+    static final int REPLIQUES = 10;
     //Serveix per a configurar el nombre de centrals de cada tipus que es volen generar (A, B, C)
     static final int[] TIPUS_CENTRALS = {5, 10, 25};
     // Serveix per a indicar el nombre de clients que es volen generar
@@ -23,7 +23,7 @@ public class Main {
     // (1: Calcul del benefici, 2: Calcul dels MW lliures, 3: Calcul dels MW ocupats utilitzant la fòrmula de l'antropia, 4: Calcul dels MW ocupats amb pes, 5. Energia perduda per distància)
     static final int HEURISTICA = 1;
     // Serveix per seleccionar el tiùs de generació de l'estat inicial (1. Ordenat, 2. Aleatori, 3. Greedy)
-    private static final int ESTAT_INICIAL = 3;
+    private static final int ESTAT_INICIAL = 1;
     // Serveix per indicar la seed que s'utilitzarà per a generar l'estat inicial.
     static int seed = 1234;
     static Random myRandom;
@@ -37,7 +37,7 @@ public class Main {
     public static void main(String[] args) {
         if (REPLIQUES > 1) {
             try {
-                System.setOut(new PrintStream(new FileOutputStream("resultats.txt")));
+                System.setOut(new PrintStream(new FileOutputStream("resultatsSnM2.txt")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
