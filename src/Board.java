@@ -26,10 +26,10 @@ public class Board {
         assignacionsConsumidors = new ArrayList<>();
         int i = 0;
         for (ArrayList<Integer> oldSet : board_to_copy.getAssignacionsConsumidors()) {
-            assignacionsConsumidors.add(new ArrayList<>());
-            for (Integer j : oldSet) {
+            assignacionsConsumidors.add((ArrayList<Integer>) oldSet.clone());
+            /*for (Integer j : oldSet) {
                 assignacionsConsumidors.get(i).add(j);
-            }
+            } */
             i++;
         }
     }
@@ -131,8 +131,8 @@ public class Board {
                     }
                 }
             }
-            centrals_intentades.add(central_id);
             if (setAssignacioConsumidor(central_id, client_id)) return true;
+            centrals_intentades.add(central_id);
 
         }
         return false;
