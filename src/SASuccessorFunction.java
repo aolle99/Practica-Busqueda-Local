@@ -31,9 +31,16 @@ public class SASuccessorFunction implements SuccessorFunction {
 
     private void moveConsumidors() {
         int id_client = myRandom.nextInt(clients.size());
-        int id_central = myRandom.nextInt(centrals.size());
+        int id_central = myRandom.nextInt(centrals.size() + 1);
+        ferMoveConsumidors(id_client, id_central);
+    }
+
+    private void ferMoveConsumidors(int id_client, int id_central) {
         int old_central = board.getAssignacioCentral(id_client);
-        if (board.canMove(id_client, id_central, old_central)) {
+        boolean canMove;
+        if (id_central == centrals.size()) canMove = board.canMoveExclosa(id_client, old_central);
+        else canMove = board.canMove(id_client, id_central, old_central);
+        if (canMove) {
             Board estat_successor = new Board(board);
             estat_successor.move(id_client, id_central, old_central);
             String action = "Mou consumidor " + id_client + " a la central " + id_central;

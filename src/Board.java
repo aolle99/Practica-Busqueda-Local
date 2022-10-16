@@ -359,9 +359,14 @@ public class Board {
 
     public boolean canMove(int id_client, int id_central, int old_central) {
         if (old_central == id_central) return false;
-        if (isCentralExcluida(id_central) && clients.get(id_client).getContrato() == Cliente.GARANTIZADO) return false;
-        if (!isCentralExcluida(id_central) && getMwLliuresCentralAmbNouConsumidor(id_central, id_client) < 0)
+        if (getMwLliuresCentralAmbNouConsumidor(id_central, id_client) < 0)
             return false;
+        return true;
+    }
+
+    public boolean canMoveExclosa(int id_client, int old_central) {
+        if (isCentralExcluida(old_central)) return false;
+        if (clients.get(id_client).getContrato() == Cliente.GARANTIZADO) return false;
         return true;
     }
 
