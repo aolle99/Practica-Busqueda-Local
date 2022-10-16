@@ -41,7 +41,10 @@ public class HCSuccessorFunction implements SuccessorFunction {
 
     private void ferMoveConsumidors(int id_client, int id_central) {
         int old_central = board.getAssignacioCentral(id_client);
-        if (board.canMove(id_client, id_central, old_central)) {
+        boolean canMove;
+        if (id_central == centrals.size()) canMove = board.canMoveExclosa(id_client, old_central);
+        else canMove = board.canMove(id_client, id_central, old_central);
+        if (canMove) {
             Board estat_successor = new Board(board);
             estat_successor.move(id_client, id_central, old_central);
             String action = "Mou consumidor " + id_client + " a la central " + id_central;
@@ -59,7 +62,7 @@ public class HCSuccessorFunction implements SuccessorFunction {
 
         d1 = new Date();
         //Swap de dos consumidors de central
-        //swapConsumidors();
+        swapConsumidors();
 
         // Canviar un consumidor de central
         moveConsumidors();
