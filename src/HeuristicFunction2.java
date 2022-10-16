@@ -12,7 +12,7 @@ public class HeuristicFunction2 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
         Board board = (Board) state;
-        return -board.getTotalMWLliures();
+        return board.getTotalMWLliures();
     }
 
 }
