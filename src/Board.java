@@ -4,8 +4,6 @@ import java.text.NumberFormat;
 import java.util.*;
 
 public class Board {
-
-    private ArrayList<ArrayList<Integer>> assignacionsConsumidors;
     private ArrayList<Integer> assignacionsCentrals;
     private ArrayList<Double> mwLliuresCentrals;
     private static ArrayList<Central> centrals;
@@ -20,19 +18,9 @@ public class Board {
     /********************** CONSTRUCTORS **********************/
     public Board() {
         myRandom = new Random();
-
     }
 
     public Board(Board board_to_copy) {
-        assignacionsConsumidors = new ArrayList<>();
-        int i = 0;
-        for (ArrayList<Integer> oldSet : board_to_copy.getAssignacionsConsumidors()) {
-            assignacionsConsumidors.add((ArrayList<Integer>) oldSet.clone());
-            /*for (Integer j : oldSet) {
-                assignacionsConsumidors.get(i).add(j);
-            } */
-            i++;
-        }
         assignacionsCentrals = (ArrayList<Integer>) board_to_copy.getAssignacionsCentrals().clone();
         mwLliuresCentrals = (ArrayList<Double>) board_to_copy.getMwLliuresCentrals().clone();
     }
@@ -42,13 +30,10 @@ public class Board {
         centrals = new Centrales(tipos_centrales, seed);
         numCentrals = centrals.size();
         // La mida d'assignacionsConsumidors es centrals.size() + 1 perquè a l'última posició s'assignaran tots els clients que no siguin subministrats.
-        assignacionsConsumidors = new ArrayList<>(numCentrals + 1);
         mwLliuresCentrals = new ArrayList<>(numCentrals);
         for (int i = 0; i < numCentrals; i++) {
-            assignacionsConsumidors.add(new ArrayList<>());
             mwLliuresCentrals.add(centrals.get(i).getProduccion());
         }
-        assignacionsConsumidors.add(new ArrayList<>()); // Central exclosa
     }
 
     public void generarClients(int ncl, double[] propc, double propg, int seed) throws Exception {
@@ -179,22 +164,20 @@ public class Board {
     /********************** HEURISTIQUES **********************/
     public double getCostCentrals() {
         double cost = 0;
-        for (int i = 0; i < numCentrals; ++i) {
-            // Suma dels costos de les centrals que estan enceses
-            Central central = centrals.get(i);
+        for (int central_id = 0; central_id < numCentrals; ++central_id) {
+            // El client està sent subministrat per una central
+            Central central = centrals.get(central_id);
             // Cost central en marxa
-            if (!assignacionsConsumidors.get(i).isEmpty()) {
-                // Sumar costos
+            double mwLliures = getMwLliuresCentral(central_id);
+            if (mwLliures != central.getProduccion()){
                 try {
-                    if (getMwLliuresCentral(i) < 0) return Integer.MAX_VALUE;
+                    if (mwLliures < 0) return Integer.MAX_VALUE;
                     cost += VEnergia.getCosteMarcha(central.getTipo());
                     cost += VEnergia.getCosteProduccionMW(central.getTipo()) * central.getProduccion();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
                 }
-            }
-            // Cost central parada
-            else {
+            } else {
                 try {
                     cost += VEnergia.getCosteParada(central.getTipo());
                 } catch (Exception e) {
@@ -207,10 +190,11 @@ public class Board {
 
     public double getBeneficiConsumidors() {
         double beneficio = 0;
-        for (int i = 0; i < numCentrals; ++i) {
-            ArrayList<Integer> clientsCentral = assignacionsConsumidors.get(i);
-            for (int client_id : clientsCentral) {
-                Cliente client = clients.get(client_id);
+        for (int i = 0; i < numClients; ++i) {
+            Cliente client = clients.get(i);
+            // El client està sent subministrat per una central
+            int central_id = getAssignacioCentral(i);
+            if(central_id != numCentrals){
                 if (client.getContrato() == Cliente.GARANTIZADO) {
                     try {
                         beneficio += VEnergia.getTarifaClienteGarantizada(client.getTipo()) * client.getConsumo();
@@ -224,79 +208,26 @@ public class Board {
                         throw new RuntimeException(e);
                     }
                 }
-            }
-        }
-        ArrayList<Integer> clientsExclosos = assignacionsConsumidors.get(numCentrals);
-        for (int client_id : clientsExclosos) {
-            Cliente client = clients.get(client_id);
-            try {
-                if (client.getContrato() == Cliente.GARANTIZADO) return Integer.MAX_VALUE;
-                beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo()) * client.getConsumo();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
+            } else { // El client no està subministrat per cap central
+                try {
+                    if (client.getContrato() == Cliente.GARANTIZADO) return Integer.MAX_VALUE;
+                    beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo()) * client.getConsumo();
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
             }
         }
         return beneficio;
     }
 
     public double getBenefici() {
-        double beneficio = 0;
-        for (int i = 0; i < numCentrals; ++i) {
-            ArrayList<Integer> clientsCentral = assignacionsConsumidors.get(i);
-            for (int client_id : clientsCentral) {
-                Cliente client = clients.get(client_id);
-                if (client.getContrato() == Cliente.GARANTIZADO) {
-                    try {
-                        beneficio += VEnergia.getTarifaClienteGarantizada(client.getTipo()) * client.getConsumo();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                } else {
-                    try {
-                        beneficio += VEnergia.getTarifaClienteNoGarantizada(client.getTipo()) * client.getConsumo();
-                    } catch (Exception e) {
-                        throw new RuntimeException(e);
-                    }
-                }
-            }
-            Central central = centrals.get(i);
-            // Cost central en marxa
-            if (!assignacionsConsumidors.get(i).isEmpty()) {
-                // Sumar costos
-                try {
-                    if (getMwLliuresCentral(i) < 0) return Integer.MAX_VALUE;
-                    beneficio -= VEnergia.getCosteMarcha(central.getTipo());
-                    beneficio -= VEnergia.getCosteProduccionMW(central.getTipo()) * central.getProduccion();
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-            // Cost central parada
-            else {
-                try {
-                    beneficio -= VEnergia.getCosteParada(central.getTipo());
-                } catch (Exception e) {
-                    throw new RuntimeException(e);
-                }
-            }
-        }
-        ArrayList<Integer> clientsExclosos = assignacionsConsumidors.get(numCentrals);
-        for (int client_id : clientsExclosos) {
-            Cliente client = clients.get(client_id);
-            try {
-                if (client.getContrato() == Cliente.GARANTIZADO) return Integer.MAX_VALUE;
-                beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo()) * client.getConsumo();
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
-        }
-        return beneficio;
+        return getBeneficiConsumidors() - getCostCentrals();
     }
 
     public double getTotalMWLliures() {
         double mwLliures = 0;
         for (int i = 0; i < centrals.size(); ++i) {
-            if (!assignacionsConsumidors.get(i).isEmpty()) {
+            if (getMwLliuresCentral(i) != centrals.get(i).getProduccion()) {
                 mwLliures += getMwLliuresCentral(i);
             }
         }
@@ -306,7 +237,7 @@ public class Board {
     public double getMWEntropia() {
         double entropia = 0;
         for (int i = 0; i < centrals.size(); ++i) {
-            if (!assignacionsConsumidors.get(i).isEmpty()) {
+            if (getMwLliuresCentral(i) != centrals.get(i).getProduccion()) {
                 double prob = (centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / centrals.get(i).getProduccion();
                 if (prob != 0) {
                     entropia += prob * Math.log(prob);
@@ -319,7 +250,7 @@ public class Board {
     public double getMWOcupatsAmbPes() {
         double ocupats = 0;
         for (int i = 0; i < numCentrals; ++i) {
-            if (!assignacionsConsumidors.get(i).isEmpty())
+            if (getMwLliuresCentral(i) != centrals.get(i).getProduccion())
                 ocupats += Math.log(centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / Math.log(2);
         }
         return ocupats;
@@ -327,12 +258,10 @@ public class Board {
 
     public double getEnergiaPerdudaPerDistancia() {
         double perduda = 0;
-        for (int central_id = 0; central_id < numCentrals; central_id++) {
-            int nConsumidorsAssignats = assignacionsConsumidors.get(central_id).size();
-            for (int client_id = 0; client_id < nConsumidorsAssignats; client_id++) {
-                Cliente client = clients.get(client_id);
-                perduda += client.getConsumo() * VEnergia.getPerdida(getDistancia(client_id, central_id));
-            }
+        for (int i = 0; i < numClients; i++){
+            Cliente client = clients.get(i);
+            int central_id = getAssignacioCentral(i);
+            perduda += client.getConsumo() * VEnergia.getPerdida(getDistancia(i, central_id));
         }
         return perduda;
     }
@@ -394,7 +323,9 @@ public class Board {
     public int getCentralsApagades() {
         int centralsApagades = 0;
         for (int i = 0; i < numCentrals; ++i) {
-            if (assignacionsConsumidors.get(i).isEmpty()) ++centralsApagades;
+            if (getMwLliuresCentral(i) == centrals.get(i).getProduccion()) {
+                ++centralsApagades;
+            }
         }
         return centralsApagades;
     }
@@ -425,31 +356,33 @@ public class Board {
         return consums.get(client_id).get(central_id);
     }
 
-
+    public int getAssignacioConsumidor(int central_id){
+        for (int i = 0; i < numClients; ++i) {
+            if (assignacionsCentrals.get(i) == central_id) return i;
+        }
+        return numCentrals;
+    }
     public Boolean setAssignacioConsumidor(int central_id, int client_id) {
         // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
         if (!isCentralExcluida(central_id)) {
             double mw_lliures = getMwLliuresCentral(central_id);
             if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
-                assignacionsConsumidors.get(central_id).add(client_id);
                 assignacionsCentrals.set(client_id, central_id);
                 mwLliuresCentrals.set(central_id, mw_lliures - getConsumMwClientACentral(client_id, central_id));
                 return true;
             }
             return false;
         }
-        assignacionsConsumidors.get(central_id).add(client_id);
         assignacionsCentrals.set(client_id, numCentrals);
         return true;
     }
 
     public void setClientExclos(int client_id) {
         // Assigna el client a la central exclosa
-        assignacionsConsumidors.get(numCentrals).add(client_id);
+        assignacionsCentrals.set(client_id, numCentrals);
     }
 
     private void removeClientDeCentral(int client_id, int central_id) {
-        assignacionsConsumidors.get(central_id).remove(Integer.valueOf(client_id));
         if (!isCentralExcluida(central_id)) {
             double mw_lliures = getMwLliuresCentral(central_id);
             mwLliuresCentrals.set(central_id, mw_lliures + getConsumMwClientACentral(client_id, central_id));
@@ -462,10 +395,6 @@ public class Board {
 
     public static ArrayList<Cliente> getClients() {
         return clients;
-    }
-
-    public ArrayList<ArrayList<Integer>> getAssignacionsConsumidors() {
-        return assignacionsConsumidors;
     }
 
     public ArrayList<Integer> getAssignacionsCentrals() {
@@ -481,7 +410,11 @@ public class Board {
     }
 
     private int getClientesNoAsignados() {
-        return assignacionsConsumidors.get(numCentrals).size();
+        int clientesNoAsignados = 0;
+        for (int i = 0; i < numClients; ++i) {
+            if (getAssignacioCentral(i) == numCentrals) ++clientesNoAsignados;
+        }
+        return clientesNoAsignados;
     }
 
     /********************** PRINTS PER CONSOLA **********************/
