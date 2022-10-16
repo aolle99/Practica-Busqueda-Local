@@ -262,7 +262,8 @@ public class Board {
             Cliente client = clients.get(i);
             int central_id = getAssignacioCentral(i);
             if (central_id != numCentrals)
-                perduda += client.getConsumo() * VEnergia.getPerdida(getDistancia(i, central_id));
+                perduda += VEnergia.getPerdida(getDistancia(i, central_id)) * client.getConsumo();
+            else perduda += client.getConsumo();
         }
         return perduda;
     }
