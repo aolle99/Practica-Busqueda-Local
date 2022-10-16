@@ -424,6 +424,7 @@ public class Board {
         System.out.println("---------------------");
         System.out.println("Benefici: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
                 .format(getBenefici()));
+        System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
         System.out.println("---------------------");
     }
 }
