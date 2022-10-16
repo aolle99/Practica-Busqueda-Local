@@ -21,7 +21,7 @@ public class Main {
     static final double PROPG = 0.75;
     //Serveix per a seleccionar l'heurística que es vol utilitzar.
     // (1: Calcul del benefici, 2: Calcul dels MW lliures, 3: Calcul dels MW ocupats utilitzant la fòrmula de l'antropia, 4: Calcul dels MW ocupats amb pes, 5. Energia perduda per distància)
-    static final int HEURISTICA = 2;
+    static final int HEURISTICA = 1;
     // Serveix per seleccionar el tiùs de generació de l'estat inicial (1. Ordenat, 2. Aleatori, 3. Greedy)
     private static final int ESTAT_INICIAL = 3;
     // Serveix per indicar la seed que s'utilitzarà per a generar l'estat inicial.
