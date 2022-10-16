@@ -14,6 +14,7 @@ public class Board {
     private static int numClients;
     private static int numCentrals;
     private static ArrayList<ArrayList<Double>> distancies; // distancies[clients][centrals]
+    private static ArrayList<ArrayList<Double>> consums; // consums[clients][centrals]
     private static Random myRandom;
     static final int MAX_TRIES = 10000;
 
@@ -48,14 +49,18 @@ public class Board {
     public void generarClients(int ncl, double[] propc, double propg, int seed) throws Exception {
         clients = new Clientes(ncl, propc, propg, seed);
         numClients = clients.size();
-        distancies = new ArrayList<>(numCentrals);
+        distancies = new ArrayList<>(numClients);
+        consums = new ArrayList<>(numClients);
         for (int i = 0; i < numClients; i++) {
-            distancies.add(new ArrayList<>(numClients));
+            distancies.add(new ArrayList<>(numCentrals));
+            consums.add(new ArrayList<>(numCentrals));
             for (int j = 0; j < numCentrals; j++) {
                 distancies.get(i).add(calcularDistancia(clients.get(i), centrals.get(j)));
+                consums.get(i).add(calcularConsumMwClientACentral(i, j));
             }
         }
     }
+
 
     private int asignarCentralLineal(int client_id, int central_id) {
         Cliente client = clients.get(client_id);
@@ -389,9 +394,9 @@ public class Board {
     }
 
     public int getAssignacioCentral(int client_id) {
-        // Retorna la central a la que es troba el client, -1 en cas que no estigui assignat el client
-        for (int i = 0; i < centrals.size(); i++) {
-            if (assignacionsConsumidors.get(i).contains(client_id)) return i;
+        // Retorna la central a la que es troba el client, numCentrals en cas que no estigui assignat el client
+        for (int central_id = 0; central_id < centrals.size(); central_id++) {
+            if (assignacionsConsumidors.get(central_id).contains(client_id)) return central_id;
         }
         return numCentrals;
     }
@@ -414,10 +419,15 @@ public class Board {
         return mwLliures;
     }
 
-    public double getConsumMwClientACentral(int client_id, int central_id) {
+    public double calcularConsumMwClientACentral(int client_id, int central_id) {
         Cliente client = clients.get(client_id);
         return client.getConsumo() + client.getConsumo() * VEnergia.getPerdida(getDistancia(client_id, central_id));
     }
+
+    public double getConsumMwClientACentral(int client_id, int central_id) {
+        return consums.get(client_id).get(central_id);
+    }
+
 
     public Boolean setAssignacioConsumidor(int central_id, int client_id) {
         // Retorna true si s'ha pogut assignar tots els clients, false en cas contrari
