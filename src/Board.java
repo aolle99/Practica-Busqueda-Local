@@ -334,9 +334,8 @@ public class Board {
     /********************** OPERADORS **********************/
 
 
-    public boolean canSwap(int client1_id, int client2_id) {
-        int central1_id = getAssignacioCentral(client1_id);
-        int central2_id = getAssignacioCentral(client2_id);
+    public boolean canSwap(int client1_id, int client2_id, int central1_id, int central2_id) {
+
         if (central1_id == central2_id) return false;
         if (isCentralExcluida(central1_id) && clients.get(client2_id).getContrato() == Cliente.GARANTIZADO)
             return false;
@@ -349,10 +348,7 @@ public class Board {
         return true;
     }
 
-    public void swap(int client1_id, int client2_id) {
-        int central1_id = getAssignacioCentral(client1_id);
-        int central2_id = getAssignacioCentral(client2_id);
-
+    public void swap(int client1_id, int client2_id, int central1_id, int central2_id) {
         assignacionsConsumidors.get(central1_id).remove(Integer.valueOf(client1_id));
         assignacionsConsumidors.get(central2_id).remove(Integer.valueOf(client2_id));
         setAssignacioConsumidor(central1_id, client2_id);
@@ -360,16 +356,15 @@ public class Board {
 
     }
 
-    public boolean canMove(int id_client, int id_central) {
-        if (getAssignacioCentral(id_client) == id_central) return false;
+    public boolean canMove(int id_client, int id_central, int old_central) {
+        if (old_central == id_central) return false;
         if (isCentralExcluida(id_central) && clients.get(id_client).getContrato() == Cliente.GARANTIZADO) return false;
         if (!isCentralExcluida(id_central) && getMwLliuresCentralAmbNouConsumidor(id_central, id_client) < 0)
             return false;
         return true;
     }
 
-    public void move(int id_client, int id_central) {
-        int old_central = getAssignacioCentral(id_client);
+    public void move(int id_client, int id_central, int old_central) {
         assignacionsConsumidors.get(old_central).remove(Integer.valueOf(id_client));
         setAssignacioConsumidor(id_central, id_client);
     }

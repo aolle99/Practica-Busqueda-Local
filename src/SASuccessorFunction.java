@@ -19,11 +19,11 @@ public class SASuccessorFunction implements SuccessorFunction {
     private void swapConsumidors() {
         int client1_id = myRandom.nextInt(clients.size());
         int client2_id = myRandom.nextInt(clients.size());
-        if (board.canSwap(client1_id, client2_id)) {
+        int central1_id = board.getAssignacioCentral(client1_id);
+        int central2_id = board.getAssignacioCentral(client2_id);
+        if (board.canSwap(client1_id, client2_id, central1_id, central2_id)) {
             Board estat_successor = new Board(board);
-            estat_successor.swap(client1_id, client2_id);
-            int central2_id = board.getAssignacioCentral(client2_id);
-            int central1_id = board.getAssignacioCentral(client1_id);
+            estat_successor.swap(client1_id, client2_id, central1_id, central2_id);
             String action = "Swap consumidor " + client1_id + " de la central " + central1_id + " amb consumidor " + client2_id + " de la central " + central2_id;
             successors.add(new Successor(action, estat_successor));
         }
@@ -32,9 +32,10 @@ public class SASuccessorFunction implements SuccessorFunction {
     private void moveConsumidors() {
         int id_client = myRandom.nextInt(clients.size());
         int id_central = myRandom.nextInt(centrals.size());
-        if (board.canMove(id_client, id_central)) {
+        int old_central = board.getAssignacioCentral(id_client);
+        if (board.canMove(id_client, id_central, old_central)) {
             Board estat_successor = new Board(board);
-            estat_successor.move(id_client, id_central);
+            estat_successor.move(id_client, id_central, old_central);
             String action = "Mou consumidor " + id_client + " a la central " + id_central;
             successors.add(new Successor(action, estat_successor));
         }
