@@ -13,7 +13,7 @@ public class Board {
     private static ArrayList<Cliente> clients;
     private static int numClients;
     private static int numCentrals;
-    private static ArrayList<ArrayList<Double>> distancies;
+    private static ArrayList<ArrayList<Double>> distancies; // distancies[clients][centrals]
     private static Random myRandom;
     static final int MAX_TRIES = 10000;
 
@@ -119,11 +119,11 @@ public class Board {
     }
 
     private Boolean assignarCentralGreedy(int client_id) {
-        int central_id = 0;
-        double min_distancia = Double.MAX_VALUE;
         HashSet<Integer> centrals_intentades = new HashSet<>();
-        for (int it = 0; it < numCentrals; ++it) {
-            for (int i = 0; i < numCentrals; ++i) {
+        for (int it = 0; it < numCentrals; ++it) { // Fem l'intent d'intertarlo en totes les centrals
+            int central_id = 0;
+            double min_distancia = Double.MAX_VALUE;
+            for (int i = 0; i < numCentrals; ++i) { // Busquem la central més propera
                 if (!centrals_intentades.contains(i)) {
                     if (distancies.get(client_id).get(i) < min_distancia) {
                         min_distancia = distancies.get(client_id).get(i);
@@ -143,7 +143,6 @@ public class Board {
         for (int client_id = 0; client_id < numClients; ++client_id) {
             Cliente client = clients.get(client_id);
             if (client.getContrato() == Cliente.GARANTIZADO) {
-                System.out.println("Client " + client_id + " garantitzat");
                 if (!assignarCentralGreedy(client_id)) return false;
             } else clientsNoGarantitzats.add(client_id);
 
