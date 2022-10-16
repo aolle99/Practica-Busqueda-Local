@@ -7,6 +7,7 @@ public class Board {
 
     private ArrayList<ArrayList<Integer>> assignacionsConsumidors;
     private ArrayList<Integer> assignacionsCentrals;
+    private ArrayList<Double> mwLliuresCentrals;
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
     private static int numClients;
@@ -43,6 +44,7 @@ public class Board {
         assignacionsConsumidors = new ArrayList<>(numCentrals + 1);
         for (int i = 0; i < numCentrals + 1; i++) {
             assignacionsConsumidors.add(new ArrayList<>());
+            mwLliuresCentrals.add(centrals.get(i).getProduccion());
         }
     }
 
@@ -94,7 +96,7 @@ public class Board {
         int tries = 0;
         while (!setAssignacioConsumidor(central_id, client_id)) {
             if (tries < MAX_TRIES) {
-                central_id = new Random().nextInt(numCentrals);
+                central_id = myRandom.nextInt(numCentrals);
                 ++tries;
             } else {
                 if (client.getContrato() == Cliente.GARANTIZADO) return false;
@@ -396,13 +398,7 @@ public class Board {
 
     public double getMwLliuresCentral(int central_id) {
         // Retorna els megawatts lliures de la central
-        Central central = centrals.get(central_id);
-        double mw_lliures = central.getProduccion();
-        ArrayList<Integer> clientsCentralX = assignacionsConsumidors.get(central_id);
-        for (int client_id : clientsCentralX) {
-            mw_lliures -= getConsumMwClientACentral(client_id, central_id);
-        }
-        return mw_lliures;
+        return mwLliuresCentrals.get(central_id);
     }
 
     public double getMwLliuresCentralAmbNouConsumidor(int central_id, int client_id) {
@@ -429,6 +425,7 @@ public class Board {
             if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
                 assignacionsConsumidors.get(central_id).add(client_id);
                 assignacionsCentrals.set(client_id, central_id);
+                mwLliuresCentrals.set(central_id, mw_lliures - getConsumMwClientACentral(client_id, central_id));
                 return true;
             }
             return false;
