@@ -34,6 +34,7 @@ public class Board {
             i++;
         }
         assignacionsCentrals = (ArrayList<Integer>) board_to_copy.getAssignacionsCentrals().clone();
+        mwLliuresCentrals = (ArrayList<Double>) board_to_copy.getMwLliuresCentrals().clone();
     }
 
     /********************** GENERADORS **********************/
@@ -42,10 +43,12 @@ public class Board {
         numCentrals = centrals.size();
         // La mida d'assignacionsConsumidors es centrals.size() + 1 perquè a l'última posició s'assignaran tots els clients que no siguin subministrats.
         assignacionsConsumidors = new ArrayList<>(numCentrals + 1);
-        for (int i = 0; i < numCentrals + 1; i++) {
+        mwLliuresCentrals = new ArrayList<>(numCentrals);
+        for (int i = 0; i < numCentrals; i++) {
             assignacionsConsumidors.add(new ArrayList<>());
             mwLliuresCentrals.add(centrals.get(i).getProduccion());
         }
+        assignacionsConsumidors.add(new ArrayList<>()); // Central exclosa
     }
 
     public void generarClients(int ncl, double[] propc, double propg, int seed) throws Exception {
@@ -352,8 +355,8 @@ public class Board {
     }
 
     public void swap(int client1_id, int client2_id, int central1_id, int central2_id) {
-        assignacionsConsumidors.get(central1_id).remove(Integer.valueOf(client1_id));
-        assignacionsConsumidors.get(central2_id).remove(Integer.valueOf(client2_id));
+        removeClientDeCentral(client1_id, central1_id);
+        removeClientDeCentral(client2_id, central2_id);
         setAssignacioConsumidor(central1_id, client2_id);
         setAssignacioConsumidor(central2_id, client1_id);
 
@@ -373,7 +376,7 @@ public class Board {
     }
 
     public void move(int id_client, int id_central, int old_central) {
-        assignacionsConsumidors.get(old_central).remove(Integer.valueOf(id_client));
+        removeClientDeCentral(id_client, old_central);
         setAssignacioConsumidor(id_central, id_client);
     }
 
@@ -445,6 +448,14 @@ public class Board {
         assignacionsConsumidors.get(numCentrals).add(client_id);
     }
 
+    private void removeClientDeCentral(int client_id, int central_id) {
+        assignacionsConsumidors.get(central_id).remove(Integer.valueOf(client_id));
+        if (!isCentralExcluida(central_id)) {
+            double mw_lliures = getMwLliuresCentral(central_id);
+            mwLliuresCentrals.set(central_id, mw_lliures + getConsumMwClientACentral(client_id, central_id));
+        }
+    }
+
     public static ArrayList<Central> getCentrals() {
         return centrals;
     }
@@ -459,6 +470,10 @@ public class Board {
 
     public ArrayList<Integer> getAssignacionsCentrals() {
         return assignacionsCentrals;
+    }
+
+    public ArrayList<Double> getMwLliuresCentrals() {
+        return mwLliuresCentrals;
     }
 
     public boolean isCentralExcluida(int central_id) {

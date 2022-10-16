@@ -49,7 +49,7 @@ public class Main {
                 hillClimbing();
                 //simulatedAnnealing();
             }
-            System.out.println("|===============================================================|");
+            System.out.println("|===========================================================|");
             System.out.println();
         }
     }
