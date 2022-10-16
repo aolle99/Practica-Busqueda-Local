@@ -419,18 +419,9 @@ public class Board {
 
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
-        double costCentrals = getCostCentrals();
-        double beneficiConsumidors = getBeneficiConsumidors();
-        int clientesNoAsignados = getClientesNoAsignados();
         System.out.println("---------------------");
-        System.out.println("Coste de las centrales: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(costCentrals));
-        System.out.println("Benefici de los consumidores: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(beneficiConsumidors));
-        System.out.println("Benefici total: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format((beneficiConsumidors - costCentrals)));
-        System.out.println("Clientes asignados: " + (numClients - clientesNoAsignados) + "/" + numClients);
-        System.out.println("Centrals apagades: " + getCentralsApagades() + "/" + numCentrals);
+        System.out.println("Benefici: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
+                .format(getBenefici()));
         System.out.println("---------------------");
     }
 }
