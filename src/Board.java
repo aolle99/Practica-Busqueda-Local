@@ -1,14 +1,12 @@
 import IA.Energia.*;
 
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Random;
+import java.util.*;
 
 public class Board {
 
     private ArrayList<ArrayList<Integer>> assignacionsConsumidors;
+    private ArrayList<Integer> assignacionsCentrals;
     private static ArrayList<Central> centrals;
     private static ArrayList<Cliente> clients;
     private static int numClients;
@@ -21,6 +19,7 @@ public class Board {
     /********************** CONSTRUCTORS **********************/
     public Board() {
         myRandom = new Random();
+
     }
 
     public Board(Board board_to_copy) {
@@ -33,6 +32,7 @@ public class Board {
             } */
             i++;
         }
+        assignacionsCentrals = (ArrayList<Integer>) board_to_copy.getAssignacionsCentrals().clone();
     }
 
     /********************** GENERADORS **********************/
@@ -59,6 +59,7 @@ public class Board {
                 consums.get(i).add(calcularConsumMwClientACentral(i, j));
             }
         }
+        assignacionsCentrals = new ArrayList<>(Collections.nCopies(clients.size(), numCentrals));
     }
 
 
@@ -390,10 +391,7 @@ public class Board {
 
     public int getAssignacioCentral(int client_id) {
         // Retorna la central a la que es troba el client, numCentrals en cas que no estigui assignat el client
-        for (int central_id = 0; central_id < centrals.size(); central_id++) {
-            if (assignacionsConsumidors.get(central_id).contains(client_id)) return central_id;
-        }
-        return numCentrals;
+        return assignacionsCentrals.get(client_id);
     }
 
     public double getMwLliuresCentral(int central_id) {
@@ -430,11 +428,13 @@ public class Board {
             double mw_lliures = getMwLliuresCentral(central_id);
             if (mw_lliures - getConsumMwClientACentral(client_id, central_id) >= 0) {
                 assignacionsConsumidors.get(central_id).add(client_id);
+                assignacionsCentrals.set(client_id, central_id);
                 return true;
             }
             return false;
         }
         assignacionsConsumidors.get(central_id).add(client_id);
+        assignacionsCentrals.set(client_id, numCentrals);
         return true;
     }
 
@@ -453,6 +453,10 @@ public class Board {
 
     public ArrayList<ArrayList<Integer>> getAssignacionsConsumidors() {
         return assignacionsConsumidors;
+    }
+
+    public ArrayList<Integer> getAssignacionsCentrals() {
+        return assignacionsCentrals;
     }
 
     public boolean isCentralExcluida(int central_id) {
