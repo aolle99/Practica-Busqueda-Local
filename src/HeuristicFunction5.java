@@ -11,6 +11,6 @@ public class HeuristicFunction5 implements HeuristicFunction {
 
     public double getHeuristicValue(Object state) {
         Board board = (Board) state;
-        return -board.getEnergiaPerdudaPerDistancia();
+        return board.getEnergiaPerdudaPerDistancia();
     }
 }
