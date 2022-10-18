@@ -238,7 +238,7 @@ public class Board {
         double entropia = 0;
         for (int i = 0; i < centrals.size(); ++i) {
             if (getMwLliuresCentral(i) != centrals.get(i).getProduccion()) {
-                double prob = (centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / centrals.get(i).getProduccion();
+                double prob = getMwLliuresCentral(i) / centrals.get(i).getProduccion();
                 if (prob != 0) {
                     entropia += prob * Math.log(prob);
                 }
