@@ -13,7 +13,7 @@ public class Board {
     private static ArrayList<ArrayList<Double>> distancies; // distancies[clients][centrals]
     private static ArrayList<ArrayList<Double>> consums; // consums[clients][centrals]
     private static Random myRandom;
-    static final int MAX_TRIES = 10000;
+    static int MAX_TRIES = 10000;
 
     /********************** CONSTRUCTORS **********************/
     public Board() {
@@ -82,6 +82,7 @@ public class Board {
 
     private Boolean assignarCentralAleatori(int client_id, int central_id, Cliente client) {
         int tries = 0;
+
         while (!setAssignacioConsumidor(central_id, client_id)) {
             if (tries < MAX_TRIES) {
                 central_id = myRandom.nextInt(numCentrals);
@@ -96,6 +97,7 @@ public class Board {
     }
 
     private Boolean generarEstatInicialAleatori() {
+        MAX_TRIES = numCentrals * 2;
         ArrayList<Integer> clientsNoGarantitzatsRandom = new ArrayList<>();
         for (int client_id = 0; client_id < numClients; ++client_id) {
             Cliente client = clients.get(client_id);
@@ -251,7 +253,7 @@ public class Board {
         double ocupats = 0;
         for (int i = 0; i < numCentrals; ++i) {
             if (getMwLliuresCentral(i) != centrals.get(i).getProduccion())
-                ocupats += Math.log(centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / Math.log(2);
+                ocupats += Math.pow(centrals.get(i).getProduccion() - getMwLliuresCentral(i), 2);
         }
         return ocupats;
     }
