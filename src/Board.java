@@ -16,7 +16,7 @@ public class Board {
     private static ArrayList<ArrayList<Double>> consums; // consums[clients][centrals]
     private static Random myRandom;
 
-    private static final double factor_multiplicatiu = 35;
+    private static final double factor_multiplicatiu = 150;
     static final int MAX_TRIES = 10000;
 
     /********************** CONSTRUCTORS **********************/

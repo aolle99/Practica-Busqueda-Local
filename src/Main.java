@@ -51,8 +51,8 @@ public class Main {
             //System.out.println("|=======================| REPLICA " + (i + 1) + " |=======================|");
             if (initBoard()) {
                 //board.printResultat();
-                hillClimbing();
-                //simulatedAnnealing();
+                //hillClimbing();
+                simulatedAnnealing();
             }
             //System.out.println("|============================================================|");
             //System.out.println();
