@@ -40,9 +40,9 @@ public class Searcher {
 
             temps = b.getTimeInMillis() - a.getTimeInMillis();
 
-            System.out.println(temps + " ms");
+            //System.out.println(temps);
 
-            printInstrumentation(agent.getInstrumentation());
+            //printInstrumentation(agent.getInstrumentation());
             //printActions(agent.getActions());
             Board board = (Board) search.getGoalState();
             board.printResultat();

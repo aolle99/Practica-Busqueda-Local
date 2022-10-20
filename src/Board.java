@@ -1,7 +1,9 @@
 import IA.Energia.*;
 
-import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
 
 public class Board {
     private ArrayList<Integer> assignacionsCentrals;
@@ -13,6 +15,8 @@ public class Board {
     private static ArrayList<ArrayList<Double>> distancies; // distancies[clients][centrals]
     private static ArrayList<ArrayList<Double>> consums; // consums[clients][centrals]
     private static Random myRandom;
+
+    private static final double factor_multiplicatiu = 35;
     static final int MAX_TRIES = 10000;
 
     /********************** CONSTRUCTORS **********************/
@@ -149,6 +153,13 @@ public class Board {
         return true;
     }
 
+    private Boolean generarEstatInicialBuit() {
+        for (int client_id = 0; client_id < numClients; ++client_id) {
+            setClientExclos(client_id);
+        }
+        return true;
+    }
+
     public Boolean generarEstatInicial(int tipus) {
         if (tipus == 1) {
             return generarEstatInicialLineal();
@@ -156,6 +167,8 @@ public class Board {
             return generarEstatInicialAleatori();
         } else if (tipus == 3) {
             return generarEstatInicialGreedy();
+        } else if (tipus == 4) {
+            return generarEstatInicialBuit();
         }
         System.out.println("Error: tipus d'estat inicial incorrecte");
         return false;
@@ -171,7 +184,7 @@ public class Board {
             double mwLliures = getMwLliuresCentral(central_id);
             if (mwLliures != central.getProduccion()){
                 try {
-                    if (mwLliures < 0) return Integer.MAX_VALUE;
+                    if (mwLliures < 0) cost += 57500 * factor_multiplicatiu; //57500 * 1,5
                     cost += VEnergia.getCosteMarcha(central.getTipo());
                     cost += VEnergia.getCosteProduccionMW(central.getTipo()) * central.getProduccion();
                 } catch (Exception e) {
@@ -210,7 +223,8 @@ public class Board {
                 }
             } else { // El client no està subministrat per cap central
                 try {
-                    if (client.getContrato() == Cliente.GARANTIZADO) return Integer.MAX_VALUE;
+                    if (client.getContrato() == Cliente.GARANTIZADO)
+                        beneficio -= 1000 * factor_multiplicatiu; // 50 indemnitzacio * 20 Mw *1,5 per a afegir pes
                     beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo()) * client.getConsumo();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -419,12 +433,24 @@ public class Board {
         return clientesNoAsignados;
     }
 
+    private double getClientesGarantizadosNoAsignados() {
+        int clientesAsignados = 0;
+        int totalGarantizados = 0;
+        for (int i = 0; i < numClients; ++i) {
+            if (getAssignacioCentral(i) != numCentrals && clients.get(i).getContrato() == Cliente.GARANTIZADO)
+                ++clientesAsignados;
+            if (clients.get(i).getContrato() == Cliente.GARANTIZADO) ++totalGarantizados;
+        }
+        return clientesAsignados / (totalGarantizados * 1.0);
+    }
+
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
-        System.out.println("---------------------");
-        System.out.println("Benefici: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(getBenefici()));
-        System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
-        System.out.println("---------------------");
+        //System.out.println("---------------------");
+        //System.out.println("Benefici: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()));
+        //System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
+        //System.out.println("---------------------");
+        //System.out.println(NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()).replace("\u00a0",""));
+        System.out.println(String.valueOf(getClientesGarantizadosNoAsignados()).replace(".", ","));
     }
 }
