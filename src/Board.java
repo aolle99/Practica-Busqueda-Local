@@ -419,12 +419,24 @@ public class Board {
         return clientesNoAsignados;
     }
 
+    private double getPorcentajeUtilizacionCentralsTipoC() {
+        int clientesConCentralTipoC = 0;
+        int totalAssignats = 0;
+        for (int i = 0; i < numClients; ++i) {
+            if (getAssignacioCentral(i) != numCentrals) {
+                if (centrals.get(getAssignacioCentral(i)).getTipo() == Central.CENTRALC) ++clientesConCentralTipoC;
+                ++totalAssignats;
+            }
+        }
+        return clientesConCentralTipoC / (totalAssignats * 1.0);
+    }
+
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
-        System.out.println("---------------------");
-        System.out.println("Benefici: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(getBenefici()));
-        System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
-        System.out.println("---------------------");
+        //System.out.println("---------------------");
+        System.out.println(NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()).replace("\u00A0", " "));
+        //System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
+        //System.out.println("---------------------");
+        System.out.println(String.valueOf(getPorcentajeUtilizacionCentralsTipoC()).replace(".", ","));
     }
 }
