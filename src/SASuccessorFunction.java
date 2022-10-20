@@ -54,9 +54,10 @@ public class SASuccessorFunction implements SuccessorFunction {
         successors = new ArrayList<>();
         myRandom = new Random();
         board = (Board) state;
-        int operator = myRandom.nextInt(2);
+
 
         while (successors.isEmpty()) {
+            int operator = myRandom.nextInt(2);
             if (operator == 0) {
                 //Swap de dos consumidors de central
                 swapConsumidors();
