@@ -3,43 +3,43 @@ import aima.search.framework.SuccessorFunction;
 
 import java.io.FileOutputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
 import java.util.Random;
 
 
 public class Main {
-    //Indica el número de iteraciones que se realizarán per a generar l'estat inicial.
-    static final int MAX_TRIES = 999999;
-    //Paràmetre que permet executar el codi varies vegades, per tal de
-    static final int REPLIQUES = 30;
-    //Serveix per a configurar el nombre de centrals de cada tipus que es volen generar (A, B, C)
-    static final int[] TIPUS_CENTRALS = {5, 10, 50};
-    // Serveix per a indicar el nombre de clients que es volen generar
-    static final int NUM_CLIENTS = 1000;
-    // Serveix per indicar la proporcio de clients de cada tipus que es volen generar (XG,MG,G)
-    static final double[] PROPC = {0.25, 0.30, 0.45};
-    //Serveix per indicar el percentatge de clients que són garantitzats.
-    static final double PROPG = 0.75;
-    //Serveix per a seleccionar l'heurística que es vol utilitzar.
-    // (1: Calcul del benefici, 2: Calcul dels MW lliures, 3: Calcul dels MW ocupats utilitzant la fòrmula de l'antropia, 4: Calcul dels MW ocupats amb pes, 5. Energia perduda per distància)
-    static final int HEURISTICA = 1;
-    // Serveix per seleccionar el tiùs de generació de l'estat inicial (1. Ordenat, 2. Aleatori, 3. Greedy)
-    private static final int ESTAT_INICIAL = 3;
-    // Serveix per indicar la seed que s'utilitzarà per a generar l'estat inicial.
-    static int seed = 1234;
-    static Random myRandom;
-    //Conté l'estat
-    static Board board;
-    static int iteracio = 0;
+    /**
+     * Paràmetres a modificar per tal de fer proves amb diferents valors
+     */
+    static final int REPLIQUES = 5; //Paràmetre que permet executar el codi varies vegades, per tal de fer mitjanes
+    static final int[] TIPUS_CENTRALS = {5, 10, 25}; //Serveix per a configurar el nombre de centrals de cada tipus que es volen generar (A, B, C)
+    static final int NUM_CLIENTS = 1000; // Serveix per a indicar el nombre de clients que es volen generar
+    static final double[] PROPC = {0.25, 0.30, 0.45}; // Serveix per indicar la proporcio de clients de cada tipus que es volen generar (XG,MG,G)
+    static final double PROPG = 0.75; //Serveix per indicar el percentatge de clients que són garantitzats.
+    static final int HEURISTICA = 1; //Serveix per a seleccionar l'heurística que es vol utilitzar. (1: Calcul del benefici, 2: Calcul dels MW lliures, 3: Calcul dels MW ocupats utilitzant la fòrmula de l'antropia, 4: Calcul dels MW ocupats amb pes, 5. Energia perduda per distància)
+    private static final int ESTAT_INICIAL = 3; // Serveix per seleccionar el tiùs de generació de l'estat inicial (1. Ordenat, 2. Aleatori, 3. Greedy)
+    private static final int SEARCH_ALGORITHM = 2; // 1. Hill Climbing, 2. Simulated Annealing
+    private static final int it = 1000000; // Nombre d'iteracions per a l'algorisme de simulated annealing
+    private static final int passos = 10000; // Nombre de passos per a l'algorisme de simulated annealing
+    private static final int k = 5; // Constant per a l'algorisme de simulated annealing
+    private static double lambda = 0.00001; // Constant per a l'algorisme de simulated annealing
+    private static final double[] repeticionsToTest = {}; // Serveix per a llençar execucions amb diferents valors de una variable concreta
+    private static final int SEED_TYPE = 3; // Serveix per indicar la seed que s'utilitzarà per a generar l'estat inicial. 1. Aleatori, 2. 1234, 3. Fixes
 
-    static ArrayList<Integer> seeds = new ArrayList<>();
+
+    /**
+     * Variables per a mantenir estats de la simulació. No tocar ni modificar.
+     */
+    static Random myRandom; //Variable per a generar nombres aleatoris
+    static Board board; //Conté l'estat
+    static int iteracio = 0; //Conté el nombre d'iteracions que s'han fet
+    static final int MAX_TRIES = 999999; //Indica el número de iteraciones que se realizarán per a generar l'estat inicial.
 
     /**
      * Funció principal del programa. S'encarrega de fer les crides per a l'execució del programa.
      * Permet fer varies execucions del programa, per tal de poder fer mitjanes.
      */
     public static void main(String[] args) {
-        inicializeSeedArray();
+
         if (REPLIQUES > 1) {
             try {
                 System.setOut(new PrintStream(new FileOutputStream("resultats6.txt")));
@@ -47,15 +47,30 @@ public class Main {
                 e.printStackTrace();
             }
         }
-        for (int i = 0; i < REPLIQUES; i++) {
-            System.out.println("|=======================| REPLICA " + (i + 1) + " |=======================|");
-            if (initBoard()) {
-                //board.printResultat();
-                //hillClimbing();
-                simulatedAnnealing();
+        if (repeticionsToTest.length > 0) {
+            for (double v : repeticionsToTest) {
+                //posar variable a la qual se li volen anar assignant els valors de repeticionsToTest. Exemple: lambda = v;
+                lambda = v;
+                System.out.println("-----Repeticions: " + v + "-----");
+                executarRepliques();
             }
-            System.out.println("|============================================================|");
-            System.out.println();
+        } else {
+            executarRepliques();
+        }
+
+    }
+
+    private static void executarRepliques() {
+        for (int replica = 0; replica < REPLIQUES; replica++) {
+            //System.out.println("|=======================| REPLICA " + (i + 1) + " |=======================|");
+            if (initBoard()) {
+                board.printResultat();
+                if (SEARCH_ALGORITHM == 1) hillClimbing();
+                else if (SEARCH_ALGORITHM == 2) simulatedAnnealing();
+                else System.out.println("Error: Algoritme de cerca no vàlid");
+            }
+            //System.out.println("|============================================================|");
+            //System.out.println();
             iteracio++;
         }
     }
@@ -68,8 +83,7 @@ public class Main {
     private static boolean initBoard() {
         try {
             myRandom = new Random();
-            seed = myRandom.nextInt();
-            //seed = seeds.get(iteracio);
+            int seed = selectSeed();
             board = new Board();
             board.generarCentrals(TIPUS_CENTRALS, seed);
             board.generarClients(NUM_CLIENTS, PROPC, PROPG, seed);
@@ -127,50 +141,28 @@ public class Main {
             case 5 -> heuristic = new HeuristicFunction5();
         }
 
-        int it = 1000000;
-        int pit = 10000;
-        int k = 5;
-        double lbd = 0.00001;
+
         try {
-            searcher = new Searcher(board, operators, heuristic, it, pit, k, lbd);
+            searcher = new Searcher(board, operators, heuristic, it, passos, k, lambda);
             searcher.executeSearch();
         } catch (Exception e) {
             System.err.println(e.getMessage());
         }
     }
 
-    private static void inicializeSeedArray() {
-        seeds.add(1234);
-        seeds.add(12345);
-        seeds.add(123456);
-        seeds.add(1234567);
-        seeds.add(12345678);
-        seeds.add(123456789);
-        seeds.add(1234567890);
-        seeds.add(987654321);
-        seeds.add(98765432);
-        seeds.add(9876543);
-        seeds.add(987654);
-        seeds.add(98765);
-        seeds.add(9876);
-        seeds.add(987);
-        seeds.add(98);
-        seeds.add(9);
-        seeds.add(87654321);
-        seeds.add(8765432);
-        seeds.add(876543);
-        seeds.add(87654);
-        seeds.add(8765);
-        seeds.add(876);
-        seeds.add(87);
-        seeds.add(8);
-        seeds.add(7654321);
-        seeds.add(765432);
-        seeds.add(76543);
-        seeds.add(7654);
-        seeds.add(765);
-        seeds.add(76);
-        seeds.add(7);
+    private static int selectSeed() {
+        if (SEED_TYPE == 1) return myRandom.nextInt();
+        else if (SEED_TYPE == 2) return 1234;
+        else if (SEED_TYPE == 3) return inicializeSeedArray();
+        System.out.println("Error: Seed type no vàlid");
+        return 0;
+    }
+
+    private static int inicializeSeedArray() {
+        int[] seeds = {1234, 12345, 54321, 4431, 723549, 97001, 37133, 95248, 26901, 83683, 94083, 102994, 46821, 99119, 39301, 11182, 192482,
+                33399, 1927009, 3344201, 3344992, 1998238612, 1926628822, 33399909, 199823099, 14604552, 11454829, 13276248, 15621458,
+                1};
+        return seeds[iteracio];
 
     }
 }

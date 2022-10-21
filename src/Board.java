@@ -1,7 +1,9 @@
 import IA.Energia.*;
 
-import java.text.NumberFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Random;
 
 public class Board {
     private ArrayList<Integer> assignacionsCentrals;
@@ -434,9 +436,9 @@ public class Board {
     /********************** PRINTS PER CONSOLA **********************/
     public void printResultat() {
         //System.out.println("---------------------");
-        System.out.println(NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()).replace("\u00A0", " "));
+        //System.out.println(NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()).replace("\u00A0", " "));
         //System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
         //System.out.println("---------------------");
-        System.out.println(String.valueOf(getPorcentajeUtilizacionCentralsTipoC()).replace(".", ","));
+        //System.out.println(String.valueOf(getPorcentajeUtilizacionCentralsTipoC()).replace(".", ","));
     }
 }
