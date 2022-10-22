@@ -275,9 +275,9 @@ public class Board {
             int central_id = getAssignacioCentral(i);
             if (central_id != numCentrals)
                 perduda += VEnergia.getPerdida(getDistancia(i, central_id)) * client.getConsumo();
-            else perduda += client.getConsumo();
+            else perduda += client.getConsumo() * factor_multiplicatiu;
         }
-        return perduda;
+        return Math.pow(Math.round(perduda), 50);
     }
 
     /********************** OPERADORS **********************/

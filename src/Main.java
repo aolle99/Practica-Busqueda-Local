@@ -10,7 +10,7 @@ public class Main {
     /**
      * Paràmetres a modificar per tal de fer proves amb diferents valors
      */
-    private static final int REPLIQUES = 1; //Paràmetre que permet executar el codi varies vegades, per tal de fer mitjanes
+    private static final int REPLIQUES = 30; //Paràmetre que permet executar el codi varies vegades, per tal de fer mitjanes
     private static final int[] TIPUS_CENTRALS = {5, 10, 25}; //Serveix per a configurar el nombre de centrals de cada tipus que es volen generar (A, B, C)
     static final int NUM_CLIENTS = 1000; // Serveix per a indicar el nombre de clients que es volen generar
     private static final double[] PROPC = {0.25, 0.30, 0.45}; // Serveix per indicar la proporcio de clients de cada tipus que es volen generar (XG,MG,G)
@@ -51,7 +51,6 @@ public class Main {
         if (repeticionsToTest.length > 0) {
             for (double v : repeticionsToTest) {
                 //posar variable a la qual se li volen anar assignant els valors de repeticionsToTest. Exemple: lambda = v;
-                lambda = v;
                 System.out.println("-----Repeticions: " + v + "-----");
                 executarRepliques();
             }
@@ -110,7 +109,7 @@ public class Main {
         //Declarem variables
         Searcher searcher;
         HeuristicFunction heuristic = null;
-        SuccessorFunction operators = new HCSuccessorFunction();
+        SuccessorFunction operators = new HCSuccessorFunction(DEBUG_TYPE);
 
         switch (HEURISTICA) {
             case 1 -> heuristic = new HeuristicFunction1();

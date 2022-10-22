@@ -4,6 +4,8 @@ import aima.search.framework.Successor;
 import aima.search.framework.SuccessorFunction;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 
@@ -12,6 +14,11 @@ public class HCSuccessorFunction implements SuccessorFunction {
     ArrayList<Cliente> clients;
     ArrayList<Successor> successors;
     Board board;
+    int debug = 0;
+
+    HCSuccessorFunction(int debug) {
+        this.debug = debug;
+    }
 
     private void swapConsumidors() {
         for (short client1_id = 0; client1_id < clients.size(); ++client1_id) {
@@ -55,12 +62,28 @@ public class HCSuccessorFunction implements SuccessorFunction {
         clients = Board.getClients();
         successors = new ArrayList<>();
         board = (Board) state;
-
+        Date d1 = null, d2;
+        Calendar a, b;
+        if (debug == 1) {
+            d1 = new Date();
+        }
         //Swap de dos consumidors de central
         swapConsumidors();
 
         // Canviar un consumidor de central
         moveConsumidors();
+        if (debug == 1) {
+            d2 = new Date();
+            a = Calendar.getInstance();
+            b = Calendar.getInstance();
+            assert d1 != null;
+            a.setTime(d1);
+            b.setTime(d2);
+
+            long temps = b.getTimeInMillis() - a.getTimeInMillis();
+
+            System.out.println("S'han generat " + successors.size() + " successors en " + temps + " ms");
+        }
 
         return successors;
     }
