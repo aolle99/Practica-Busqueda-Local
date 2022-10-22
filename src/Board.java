@@ -13,7 +13,9 @@ public class Board {
     private static ArrayList<ArrayList<Double>> distancies; // distancies[clients][centrals]
     private static ArrayList<ArrayList<Double>> consums; // consums[clients][centrals]
     private static Random myRandom;
-    static int MAX_TRIES = 10000;
+
+    private static final double factor_multiplicatiu = 150;
+    static final int MAX_TRIES = 10000;
 
     /********************** CONSTRUCTORS **********************/
     public Board() {
@@ -82,7 +84,6 @@ public class Board {
 
     private Boolean assignarCentralAleatori(int client_id, int central_id, Cliente client) {
         int tries = 0;
-
         while (!setAssignacioConsumidor(central_id, client_id)) {
             if (tries < MAX_TRIES) {
                 central_id = myRandom.nextInt(numCentrals);
@@ -97,7 +98,6 @@ public class Board {
     }
 
     private Boolean generarEstatInicialAleatori() {
-        MAX_TRIES = numCentrals * 2;
         ArrayList<Integer> clientsNoGarantitzatsRandom = new ArrayList<>();
         for (int client_id = 0; client_id < numClients; ++client_id) {
             Cliente client = clients.get(client_id);
@@ -151,6 +151,13 @@ public class Board {
         return true;
     }
 
+    private Boolean generarEstatInicialBuit() {
+        for (int client_id = 0; client_id < numClients; ++client_id) {
+            setClientExclos(client_id);
+        }
+        return true;
+    }
+
     public Boolean generarEstatInicial(int tipus) {
         if (tipus == 1) {
             return generarEstatInicialLineal();
@@ -158,6 +165,8 @@ public class Board {
             return generarEstatInicialAleatori();
         } else if (tipus == 3) {
             return generarEstatInicialGreedy();
+        } else if (tipus == 4) {
+            return generarEstatInicialBuit();
         }
         System.out.println("Error: tipus d'estat inicial incorrecte");
         return false;
@@ -173,7 +182,7 @@ public class Board {
             double mwLliures = getMwLliuresCentral(central_id);
             if (mwLliures != central.getProduccion()){
                 try {
-                    if (mwLliures < 0) return Integer.MAX_VALUE;
+                    if (mwLliures < 0) cost += 57500 * factor_multiplicatiu; //57500 * 1,5
                     cost += VEnergia.getCosteMarcha(central.getTipo());
                     cost += VEnergia.getCosteProduccionMW(central.getTipo()) * central.getProduccion();
                 } catch (Exception e) {
@@ -212,7 +221,8 @@ public class Board {
                 }
             } else { // El client no està subministrat per cap central
                 try {
-                    if (client.getContrato() == Cliente.GARANTIZADO) return Integer.MAX_VALUE;
+                    if (client.getContrato() == Cliente.GARANTIZADO)
+                        beneficio -= 1000 * factor_multiplicatiu; // 50 indemnitzacio * 20 Mw *1,5 per a afegir pes
                     beneficio -= VEnergia.getTarifaClientePenalizacion(client.getTipo()) * client.getConsumo();
                 } catch (Exception e) {
                     throw new RuntimeException(e);
@@ -240,7 +250,7 @@ public class Board {
         double entropia = 0;
         for (int i = 0; i < centrals.size(); ++i) {
             if (getMwLliuresCentral(i) != centrals.get(i).getProduccion()) {
-                double prob = getMwLliuresCentral(i) / centrals.get(i).getProduccion();
+                double prob = (centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / centrals.get(i).getProduccion();
                 if (prob != 0) {
                     entropia += prob * Math.log(prob);
                 }
@@ -253,7 +263,7 @@ public class Board {
         double ocupats = 0;
         for (int i = 0; i < numCentrals; ++i) {
             if (getMwLliuresCentral(i) != centrals.get(i).getProduccion())
-                ocupats += Math.pow(centrals.get(i).getProduccion() - getMwLliuresCentral(i), 2);
+                ocupats += Math.log(centrals.get(i).getProduccion() - getMwLliuresCentral(i)) / Math.log(2);
         }
         return ocupats;
     }
@@ -265,9 +275,9 @@ public class Board {
             int central_id = getAssignacioCentral(i);
             if (central_id != numCentrals)
                 perduda += VEnergia.getPerdida(getDistancia(i, central_id)) * client.getConsumo();
-            else perduda += client.getConsumo();
+            else perduda += client.getConsumo() * factor_multiplicatiu;
         }
-        return perduda;
+        return Math.pow(Math.round(perduda), 50);
     }
 
     /********************** OPERADORS **********************/
@@ -421,20 +431,38 @@ public class Board {
         return clientesNoAsignados;
     }
 
+    private double getPorcentajeUtilizacionCentralsTipoC() {
+        int clientesConCentralTipoC = 0;
+        int totalAssignats = 0;
+        for (int i = 0; i < numClients; ++i) {
+            if (getAssignacioCentral(i) != numCentrals) {
+                if (centrals.get(getAssignacioCentral(i)).getTipo() == Central.CENTRALC) ++clientesConCentralTipoC;
+                ++totalAssignats;
+            }
+        }
+        return clientesConCentralTipoC / (totalAssignats * 1.0);
+    }
+
+    private double getClientesGarantizadosNoAsignados() {
+        int clientesAsignados = 0;
+        int totalGarantizados = 0;
+        for (int i = 0; i < numClients; ++i) {
+            if (getAssignacioCentral(i) != numCentrals && clients.get(i).getContrato() == Cliente.GARANTIZADO)
+                ++clientesAsignados;
+            if (clients.get(i).getContrato() == Cliente.GARANTIZADO) ++totalGarantizados;
+        }
+        return clientesAsignados / (totalGarantizados * 1.0);
+    }
+
     /********************** PRINTS PER CONSOLA **********************/
-    public void printResultat() {
-        double costCentrals = getCostCentrals();
-        double beneficiConsumidors = getBeneficiConsumidors();
-        int clientesNoAsignados = getClientesNoAsignados();
-        System.out.println("---------------------");
-        System.out.println("Coste de las centrales: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(costCentrals));
-        System.out.println("Benefici de los consumidores: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format(beneficiConsumidors));
-        System.out.println("Benefici total: " + NumberFormat.getCurrencyInstance(new Locale("es", "ES"))
-                .format((beneficiConsumidors - costCentrals)));
-        System.out.println("Clientes asignados: " + (numClients - clientesNoAsignados) + "/" + numClients);
-        System.out.println("Centrals apagades: " + getCentralsApagades() + "/" + numCentrals);
-        System.out.println("---------------------");
+    public void printResultat(int debug) {
+        if (debug == 2 || debug == 1) {
+            if (debug == 1) System.out.print("Benefici: ");
+            System.out.println(NumberFormat.getCurrencyInstance(new Locale("es", "ES")).format(getBenefici()).replace("\u00A0", " "));
+        }
+        if (debug == 1) System.out.println("Assignats: " + (numClients - getClientesNoAsignados()) + "/" + numClients);
+        //System.out.println(String.valueOf(getPorcentajeUtilizacionCentralsTipoC()).replace(".", ","));
+        if (debug == 1)
+            System.out.println("% Garantitzats no assignats (de 0 a 1): " + String.valueOf(getClientesGarantizadosNoAsignados()).replace(".", ","));
     }
 }
