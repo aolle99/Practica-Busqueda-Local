@@ -44,7 +44,7 @@ public class Main {
 
         if (REPLIQUES > 1) {
             try {
-                System.setOut(new PrintStream(new FileOutputStream("resultats6.txt")));
+                System.setOut(new PrintStream(new FileOutputStream("resultats.txt")));
             } catch (Exception e) {
                 e.printStackTrace();
             }
