@@ -428,7 +428,7 @@ public class Board {
      * @param id_client   id del client.
      * @param id_central  id de la central a la que es vol canviar.
      * @param old_central id de la central actual que té assignada el client.
-     * @return
+     * @return retorna true si és possible fer el move, false en cas contrari.
      */
     public boolean canMove(int id_client, int id_central, int old_central) {
         if (old_central == id_central) return false;
