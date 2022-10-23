@@ -1,0 +1,22 @@
+Execució de la pràctica:
+    Per tal d'executar la pràctica, cal executar el fitxer Main.java que es troba a la carpeta src. Aquest fitxer conté el codi que s'executa per a la pràctica.
+
+En cas de voler canviar qualsevol paràmetre de la simulació, cal modificar el fitxer Main.java. Els paràmetres que es poden canviar son els que descriurem a continuació.
+    - REPLIQUES: Paràmetre que permet executar el codi varies vegades, per tal de fer mitjanes. En cas de que el nombre de repliques sigui major a 1, els resultats s'escriuran en un fitxer. En cas de que sigui 1, s'escriuran per terminal.
+    - repeticionsToTest: Serveix per a llençar execucions amb diferents valors de una variable concreta. Només cal posar els valors a provar dins de l'array i seguidament fer l'assignació al metode main.
+    - TIPUS_CENTRALS: Serveix per a configurar el nombre de centrals de cada tipus que es volen generar (A, B, C).
+    - NUM_CLIENTS = Serveix per a indicar el nombre de clients que es volen generar.
+    - PROPC: Serveix per indicar la proporcio de clients de cada tipus que es volen generar (XG,MG,G).
+    - PROPG: Serveix per indicar el percentatge de clients que són garantitzats. Ha de ser un valor entre 0 i 1.
+    - HEURISTICA: Serveix per a seleccionar l'heurística que es vol utilitzar. (1: Calcul del benefici, 2: Calcul dels MW lliures, 3: Calcul dels MW ocupats utilitzant la fòrmula de l'antropia, 4: Calcul dels MW ocupats amb pes, 5. Energia perduda per distància)
+    - ESTAT_INICIAL: Serveix per seleccionar el tiùs de generació de l'estat inicial (1. Ordenat, 2. Aleatori, 3. Greedy)
+    - OPERADOR: Serveix per seleccionar l'operador que es vol utilitzar a Hill Climbing (1. Swap, 2. Move, 3. Swap i Move)
+    - SEARCH_ALGORITHM: Serveix per seleccionar l'algorisme de cerca que es vol utilitzar (1. Hill Climbing, 2. Simulated Annealing, 3. Tabu Search)
+    - it: Nombre d'iteracions per a l'algorisme de simulated annealing
+    - passos: Nombre de passos per a l'algorisme de simulated annealing
+    - k: Constant per a l'algorisme de simulated annealing
+    - lambda: Constant per a l'algorisme de simulated annealing
+    - SEED_TYPE: Serveix per indicar la seed que s'utilitzarà per a generar l'estat inicial. 1. Aleatori, 2. 1234, 3. Fixes
+    - DEBUG_TYPE: Serveix per indicar el tipus de debug que es vol utilitzar. 0. No debug, 1. Mostrar tot 2. Debug Benefici, 3. Debug amb temps, 4. Passos de l'algorisme - Si es vol debugar alguna altra cosa, es pot fer posant debug a 0 i fent el sout.
+
+No hauria de caldre res més per a executar i/o configurar la pràctica. En cas de que es vulgui fer alguna prova més, sempre es pot modificar el print de la board o quelcom, però tot el que hem anat necessitant ho tenim ja implementat.

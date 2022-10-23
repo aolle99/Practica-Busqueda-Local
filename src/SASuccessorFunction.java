@@ -9,13 +9,16 @@ import java.util.Random;
 
 
 public class SASuccessorFunction implements SuccessorFunction {
-    ArrayList<Central> centrals;
-    ArrayList<Cliente> clients;
-    ArrayList<Successor> successors;
-    Board board;
+    ArrayList<Central> centrals; // llistat de centrals del problema
+    ArrayList<Cliente> clients; // llistat de clients del problema
+    ArrayList<Successor> successors; // llistat de successors
+    Board board; // Estat del problema actual
 
-    private static Random myRandom;
+    private static Random myRandom; // Random per generar nombres aleatoris
 
+    /**
+     * Intenta fer swap entre dos clients aleatoris
+     */
     private void swapConsumidors() {
         int client1_id = myRandom.nextInt(clients.size());
         int client2_id = myRandom.nextInt(clients.size());
@@ -29,13 +32,12 @@ public class SASuccessorFunction implements SuccessorFunction {
         }
     }
 
+    /**
+     * Intenta fer move de central a un client aleatori a una central aleatoria
+     */
     private void moveConsumidors() {
         int id_client = myRandom.nextInt(clients.size());
         int id_central = myRandom.nextInt(centrals.size() + 1);
-        ferMoveConsumidors(id_client, id_central);
-    }
-
-    private void ferMoveConsumidors(int id_client, int id_central) {
         int old_central = board.getAssignacioCentral(id_client);
         boolean canMove;
         if (id_central == centrals.size()) canMove = board.canMoveExclosa(id_client, old_central);
@@ -48,6 +50,12 @@ public class SASuccessorFunction implements SuccessorFunction {
         }
     }
 
+    /**
+     * Funció cridada per aima.search.framework.SearchAgent per generar un successor aleatori, on es criden els operadors per a generarlo.
+     *
+     * @param state estat actual del problema
+     * @return Successor generat
+     */
     public List<Successor> getSuccessors(Object state) {
         centrals = Board.getCentrals();
         clients = Board.getClients();

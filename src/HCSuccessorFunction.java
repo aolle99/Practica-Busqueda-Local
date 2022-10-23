@@ -10,16 +10,27 @@ import java.util.List;
 
 
 public class HCSuccessorFunction implements SuccessorFunction {
-    ArrayList<Central> centrals;
-    ArrayList<Cliente> clients;
-    ArrayList<Successor> successors;
-    Board board;
-    int debug = 0;
+    ArrayList<Central> centrals; // llistat de centrals del problema
+    ArrayList<Cliente> clients; // llistat de clients del problema
+    ArrayList<Successor> successors; // llistat de successors
+    Board board; // Estat del problema actual
+    int debug; // tipus de debug
+    int operador; // tipus d'operador
 
-    HCSuccessorFunction(int debug) {
+    /**
+     * Constrcutor de la classe
+     *
+     * @param debug    tipus de debug
+     * @param operador tipus d'operador
+     */
+    HCSuccessorFunction(int debug, int operador) {
         this.debug = debug;
+        this.operador = operador;
     }
 
+    /**
+     * S'encarrega de generar tots els successors fent swaps entre clients
+     */
     private void swapConsumidors() {
         for (int client1_id = 0; client1_id < clients.size(); ++client1_id) {
             for (int client2_id = client1_id + 1; client2_id < clients.size(); ++client2_id) {
@@ -35,6 +46,9 @@ public class HCSuccessorFunction implements SuccessorFunction {
         }
     }
 
+    /**
+     * S'encarrega de generar tots els successors movent elc clients de centrals.
+     */
     private void moveConsumidors() {
         for (int id_client = 0; id_client < clients.size(); ++id_client) {
             for (int id_central = 0; id_central < centrals.size(); ++id_central) {
@@ -44,6 +58,12 @@ public class HCSuccessorFunction implements SuccessorFunction {
         }
     }
 
+    /**
+     * A partir d'un client i una central, comprova si es pot fer el move. En cas que pugui, genera successor i realitza l'acció
+     *
+     * @param id_client  id del client
+     * @param id_central id de la central
+     */
     private void ferMoveConsumidors(int id_client, int id_central) {
         int old_central = board.getAssignacioCentral(id_client);
         boolean canMove;
@@ -57,6 +77,12 @@ public class HCSuccessorFunction implements SuccessorFunction {
         }
     }
 
+    /**
+     * Funció cridada per aima.search.framework.SearchAgent per generar tots els successors, on es criden els operadors per a generarlos.
+     *
+     * @param state estat actual del problema
+     * @return llistat de successors
+     */
     public List<Successor> getSuccessors(Object state) {
         centrals = Board.getCentrals();
         clients = Board.getClients();
@@ -67,11 +93,16 @@ public class HCSuccessorFunction implements SuccessorFunction {
         if (debug == 1) {
             d1 = new Date();
         }
-        //Swap de dos consumidors de central
-        swapConsumidors();
 
+        //Swap de dos consumidors de central
+        if (operador == 1 || operador == 3) {
+            swapConsumidors();
+        }
         // Canviar un consumidor de central
-        moveConsumidors();
+        if (operador == 2 || operador == 3) {
+            moveConsumidors();
+        }
+
         if (debug == 1) {
             d2 = new Date();
             a = Calendar.getInstance();
